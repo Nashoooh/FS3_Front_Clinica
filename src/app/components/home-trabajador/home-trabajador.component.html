@@ -1,0 +1,163 @@
+<div class="home-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="brand">
+        <h1>Clinimed</h1>
+        <span class="subtitle">Panel de Trabajador</span>
+      </div>
+      <div class="user-info">
+        <div class="user-details">
+          <span class="user-name">{{ usuario?.nombre }} {{ usuario?.apellido }}</span>
+          <span class="user-role">Trabajador</span>
+        </div>
+        <button class="logout-btn" (click)="logout()">
+          <span class="logout-icon">🚪</span>
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Welcome Section -->
+    <section class="welcome-section">
+      <div class="welcome-card">
+        <h2>¡Bienvenido/a, {{ usuario?.nombre }}!</h2>
+        <p class="welcome-message">
+          Panel de administrador para gestionar pacientes, citas, exámenes y todo el sistema clínico.
+        </p>
+        <p class="current-time">{{ currentTime }}</p>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="actions-section">
+      <h3>Acciones Principales</h3>
+      <div class="actions-grid">
+        <div class="action-card primary" (click)="gestionarPacientes()">
+          <div class="action-icon">👥</div>
+          <h4>Gestionar Pacientes</h4>
+          <p>Administrar información de pacientes</p>
+        </div>
+
+        <div class="action-card secondary" (click)="asignarExamenes()">
+          <div class="action-icon">📋</div>
+          <h4>Asignar Exámenes</h4>
+          <p>Seleccionar y asignar exámenes a pacientes</p>
+        </div>
+
+        <div class="action-card tertiary" (click)="gestionarCitas()">
+          <div class="action-icon">📅</div>
+          <h4>Gestionar Citas</h4>
+          <p>Programar y administrar citas médicas</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Management Tools -->
+    <section class="tools-section">
+      <h3>Herramientas de Gestión</h3>
+      <div class="tools-grid">
+        <div class="tool-card" (click)="gestionarExamenes()">
+          <div class="tool-icon">🔬</div>
+          <h4>Gestión de Exámenes</h4>
+          <p>Administrar tipos y resultados de exámenes</p>
+        </div>
+
+        <div class="tool-card" (click)="gestionarResultados()">
+          <div class="tool-icon">📊</div>
+          <h4>Resultados</h4>
+          <p>Cargar y gestionar resultados de exámenes</p>
+        </div>
+
+        <div class="tool-card" (click)="verReportes()">
+          <div class="tool-icon">📈</div>
+          <h4>Reportes</h4>
+          <p>Generar reportes y estadísticas</p>
+        </div>
+
+        <div class="tool-card" (click)="editarPerfil()">
+          <div class="tool-icon">👤</div>
+          <h4>Mi Perfil</h4>
+          <p>Actualizar información personal</p>
+        </div>
+
+        <div class="tool-card" (click)="configuracion()">
+          <div class="tool-icon">⚙️</div>
+          <h4>Configuración</h4>
+          <p>Configurar parámetros del sistema</p>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-icon">🏥</div>
+          <h4>Clínicas</h4>
+          <p>Gestionar información de clínicas</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="stats-section">
+      <h3>Resumen del Sistema</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <h4>Pacientes Registrados</h4>
+            <p class="stat-number">0</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-info">
+            <h4>Citas de Hoy</h4>
+            <p class="stat-number">0</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🔬</div>
+          <div class="stat-info">
+            <h4>Exámenes Pendientes</h4>
+            <p class="stat-number">0</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-info">
+            <h4>Resultados por Revisar</h4>
+            <p class="stat-number">0</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Activity -->
+    <section class="activity-section">
+      <div class="activity-card">
+        <h3>Actividad Reciente</h3>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-icon">ℹ️</div>
+            <div class="activity-content">
+              <p><strong>Sistema iniciado:</strong> No hay actividad reciente que mostrar</p>
+              <span class="activity-time">Sistema inicializado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>&copy; 2025 Clinimed - Sistema de Gestión de Clínicas y Exámenes</p>
+      <p>Panel de Administración - Versión 1.0.0</p>
+    </div>
+  </footer>
+</div>

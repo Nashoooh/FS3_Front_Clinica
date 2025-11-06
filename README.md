@@ -1,4 +1,55 @@
-# FrontClinica
+# Clinimed - Sistema de Gestión de Clínicas y Exámenes
+
+Frontend desarrollado en Angular 19 para el sistema de gestión de clínicas y exámenes médicos. Este proyecto consume APIs REST desde un backend Spring Boot.
+
+## Características
+
+- **Autenticación y Autorización**: Sistema de login con roles diferenciados (Paciente y Trabajador)
+- **Gestión de Usuarios**: Registro de pacientes y trabajadores con validación completa
+- **Recuperación de Contraseñas**: Sistema de recuperación mediante verificación de email
+- **Dashboard por Roles**: 
+  - Panel del paciente con gestión de citas y exámenes
+  - Panel del trabajador con herramientas administrativas
+- **Diseño Responsivo**: Optimizado para dispositivos móviles y desktop
+- **Arquitectura MVC**: Separación clara entre modelos, vistas y servicios
+
+## Tecnologías Utilizadas
+
+- Angular 19.2.14
+- TypeScript
+- RxJS para programación reactiva
+- Angular Router para navegación
+- Angular Forms (Reactive Forms)
+- CSS3 con Flexbox y Grid
+
+## Estructura del Proyecto
+
+```
+src/
+├── app/
+│   ├── components/          # Componentes de la aplicación
+│   │   ├── login/
+│   │   ├── registro/
+│   │   ├── recuperar-password/
+│   │   ├── home-paciente/
+│   │   └── home-trabajador/
+│   ├── models/              # Modelos de datos
+│   ├── services/            # Servicios para API calls
+│   ├── guards/              # Guards de autenticación
+│   └── ...
+└── ...
+```
+
+## API Backend
+
+El frontend se conecta a un backend Spring Boot en `http://localhost:9000` con los siguientes endpoints:
+
+- `POST /usuarios/login` - Autenticación de usuarios
+- `POST /usuarios` - Registro de nuevos usuarios
+- `GET /usuarios` - Obtener lista de usuarios
+- `GET /usuarios/{id}` - Obtener usuario por ID
+- `PUT /usuarios/{id}` - Actualizar usuario
+- `DELETE /usuarios/{id}` - Eliminar usuario
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.14.
 

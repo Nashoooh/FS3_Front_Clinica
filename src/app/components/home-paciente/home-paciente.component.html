@@ -1,0 +1,121 @@
+<div class="home-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="brand">
+        <h1>Clinimed</h1>
+        <span class="subtitle">Portal del Paciente</span>
+      </div>
+      <div class="user-info">
+        <div class="user-details">
+          <span class="user-name">{{ usuario?.nombre }} {{ usuario?.apellido }}</span>
+          <span class="user-role">Paciente</span>
+        </div>
+        <button class="logout-btn" (click)="logout()">
+          <span class="logout-icon">🚪</span>
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Welcome Section -->
+    <section class="welcome-section">
+      <div class="welcome-card">
+        <h2>¡Bienvenido/a, {{ usuario?.nombre }}!</h2>
+        <p class="welcome-message">
+          Desde aquí puedes gestionar tus citas médicas, ver tus exámenes y acceder a todos nuestros servicios.
+        </p>
+        <p class="current-time">{{ currentTime }}</p>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="actions-section">
+      <h3>Acciones Rápidas</h3>
+      <div class="actions-grid">
+        <div class="action-card primary" (click)="agendarCita()">
+          <div class="action-icon">📅</div>
+          <h4>Agendar Cita</h4>
+          <p>Programa una nueva cita médica</p>
+        </div>
+
+        <div class="action-card secondary" (click)="verExamenes()">
+          <div class="action-icon">🔬</div>
+          <h4>Mis Exámenes</h4>
+          <p>Consulta tus exámenes programados</p>
+        </div>
+
+        <div class="action-card tertiary" (click)="verResultados()">
+          <div class="action-icon">📊</div>
+          <h4>Resultados</h4>
+          <p>Revisa los resultados de tus exámenes</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services-section">
+      <h3>Servicios Disponibles</h3>
+      <div class="services-grid">
+        <div class="service-card" (click)="verCitas()">
+          <div class="service-icon">🗓️</div>
+          <h4>Mis Citas</h4>
+          <p>Ver y gestionar citas médicas</p>
+        </div>
+
+        <div class="service-card" (click)="verHistorial()">
+          <div class="service-icon">📋</div>
+          <h4>Historial Médico</h4>
+          <p>Accede a tu historial completo</p>
+        </div>
+
+        <div class="service-card" (click)="editarPerfil()">
+          <div class="service-icon">👤</div>
+          <h4>Mi Perfil</h4>
+          <p>Actualiza tu información personal</p>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon">💊</div>
+          <h4>Medicamentos</h4>
+          <p>Consulta tu plan de medicamentos</p>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon">🏥</div>
+          <h4>Clínicas</h4>
+          <p>Encuentra clínicas cercanas</p>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon">📞</div>
+          <h4>Contacto</h4>
+          <p>Comunícate con nosotros</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Info Section -->
+    <section class="info-section">
+      <div class="info-card">
+        <h3>Información Importante</h3>
+        <ul>
+          <li><strong>Próximas citas:</strong> No tienes citas programadas</li>
+          <li><strong>Exámenes pendientes:</strong> No tienes exámenes pendientes</li>
+          <li><strong>Resultados disponibles:</strong> No hay resultados nuevos</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>&copy; 2025 Clinimed - Sistema de Gestión de Clínicas y Exámenes</p>
+      <p>Versión 1.0.0</p>
+    </div>
+  </footer>
+</div>
