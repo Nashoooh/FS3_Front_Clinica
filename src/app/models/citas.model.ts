@@ -1,11 +1,11 @@
 export interface Analisis {
-  id: number;
+  id?: number; // Opcional para permitir creación sin ID
   nombre: string;
   descripcion: string;
 }
 
 export interface Laboratorio {
-  id: number;
+  id?: number; // Opcional para permitir creación sin ID
   nombre: string;
   direccion: string;
   telefono?: string;

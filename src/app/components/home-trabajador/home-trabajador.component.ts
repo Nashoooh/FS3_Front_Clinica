@@ -25,7 +25,7 @@ export class HomeTrabajadorComponent implements OnInit {
   // Análisis
   analisisActiveTab: 'list' | 'create' | 'search' = 'list';
   analisisList: Analisis[] = [];
-  currentAnalisis: Analisis = { id: 0, nombre: '', descripcion: '' };
+  currentAnalisis: Analisis = { nombre: '', descripcion: '' }; // Sin ID para nuevos
   searchedAnalisis: Analisis | null = null;
   searchAnalisisId: number | null = null;
   loadingAnalisis = false;
@@ -36,7 +36,7 @@ export class HomeTrabajadorComponent implements OnInit {
   // Laboratorios
   laboratoriosActiveTab: 'list' | 'create' | 'search' = 'list';
   laboratoriosList: Laboratorio[] = [];
-  currentLaboratorio: Laboratorio = { id: 0, nombre: '', direccion: '' };
+  currentLaboratorio: Laboratorio = { nombre: '', direccion: '' }; // Sin ID para nuevos
   searchedLaboratorio: Laboratorio | null = null;
   searchLaboratorioId: number | null = null;
   loadingLaboratorios = false;
@@ -124,7 +124,7 @@ export class HomeTrabajadorComponent implements OnInit {
   }
 
   resetAnalisisForm(): void {
-    this.currentAnalisis = { id: 0, nombre: '', descripcion: '' };
+    this.currentAnalisis = { nombre: '', descripcion: '' }; // Sin ID para nuevos
     this.isEditingAnalisis = false;
     this.searchedAnalisis = null;
   }
@@ -156,7 +156,14 @@ export class HomeTrabajadorComponent implements OnInit {
         }
       });
     } else {
-      this.citasService.createAnalisis(this.currentAnalisis).subscribe({
+      // Crear un objeto sin el campo 'id' para nuevas entidades
+      const nuevoAnalisis: Analisis = {
+        nombre: this.currentAnalisis.nombre,
+        descripcion: this.currentAnalisis.descripcion
+        // NO se envía 'id' - el backend lo genera automáticamente
+      };
+      
+      this.citasService.createAnalisis(nuevoAnalisis).subscribe({
         next: () => {
           this.analisisSuccessMessage = 'Análisis creado exitosamente';
           this.loadAnalisis();
@@ -173,7 +180,12 @@ export class HomeTrabajadorComponent implements OnInit {
     }
   }
 
-  deleteAnalisis(id: number): void {
+  deleteAnalisis(id: number | undefined): void {
+    if (!id) {
+      this.analisisErrorMessage = 'ID de análisis inválido';
+      return;
+    }
+    
     if (confirm('¿Estás seguro de eliminar este análisis?')) {
       this.loadingAnalisis = true;
       this.clearAnalisisMessages();
@@ -247,7 +259,7 @@ export class HomeTrabajadorComponent implements OnInit {
   }
 
   resetLaboratorioForm(): void {
-    this.currentLaboratorio = { id: 0, nombre: '', direccion: '' };
+    this.currentLaboratorio = { nombre: '', direccion: '' }; // Sin ID para nuevos
     this.isEditingLaboratorio = false;
     this.searchedLaboratorio = null;
   }
@@ -279,7 +291,17 @@ export class HomeTrabajadorComponent implements OnInit {
         }
       });
     } else {
-      this.citasService.createLaboratorio(this.currentLaboratorio).subscribe({
+      // Crear un objeto sin el campo 'id' para nuevas entidades
+      const nuevoLaboratorio: Laboratorio = {
+        nombre: this.currentLaboratorio.nombre,
+        direccion: this.currentLaboratorio.direccion,
+        telefono: this.currentLaboratorio.telefono,
+        ubicacion: this.currentLaboratorio.ubicacion,
+        capacidad: this.currentLaboratorio.capacidad
+        // NO se envía 'id' - el backend lo genera automáticamente
+      };
+      
+      this.citasService.createLaboratorio(nuevoLaboratorio).subscribe({
         next: () => {
           this.laboratoriosSuccessMessage = 'Laboratorio creado exitosamente';
           this.loadLaboratorios();
@@ -296,7 +318,12 @@ export class HomeTrabajadorComponent implements OnInit {
     }
   }
 
-  deleteLaboratorio(id: number): void {
+  deleteLaboratorio(id: number | undefined): void {
+    if (!id) {
+      this.laboratoriosErrorMessage = 'ID de laboratorio inválido';
+      return;
+    }
+    
     if (confirm('¿Estás seguro de eliminar este laboratorio?')) {
       this.loadingLaboratorios = true;
       this.clearLaboratoriosMessages();
