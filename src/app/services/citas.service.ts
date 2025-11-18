@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class CitasService {
-  private apiUrl = environment.apiUrl;
+  private apiUrl = environment.apiLaboratorios;
 
   constructor(private http: HttpClient) { }
 
