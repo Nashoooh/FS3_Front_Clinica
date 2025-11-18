@@ -32,38 +32,38 @@
       </div>
     </section>
 
-    <!-- Quick Actions -->
-    <section class="actions-section">
-      <h3>Acciones Principales</h3>
-      <div class="actions-grid">
-        <div class="action-card primary" (click)="gestionarPacientes()">
-          <div class="action-icon">👥</div>
-          <h4>Gestionar Pacientes</h4>
-          <p>Administrar información de pacientes</p>
-        </div>
-
-        <div class="action-card secondary" (click)="asignarExamenes()">
-          <div class="action-icon">📋</div>
-          <h4>Asignar Exámenes</h4>
-          <p>Seleccionar y asignar exámenes a pacientes</p>
-        </div>
-
-        <div class="action-card tertiary" (click)="gestionarCitas()">
-          <div class="action-icon">📅</div>
-          <h4>Gestionar Citas</h4>
-          <p>Programar y administrar citas médicas</p>
-        </div>
-      </div>
-    </section>
-
     <!-- Management Tools -->
     <section class="tools-section">
       <h3>Herramientas de Gestión</h3>
       <div class="tools-grid">
-        <div class="tool-card" (click)="gestionarExamenes()">
+        <div class="tool-card primary" (click)="gestionarPacientes()">
+          <div class="tool-icon">👥</div>
+          <h4>Gestionar Pacientes</h4>
+          <p>Administrar información de pacientes</p>
+        </div>
+
+        <div class="tool-card secondary" (click)="asignarExamenes()">
+          <div class="tool-icon">📋</div>
+          <h4>Asignar Exámenes</h4>
+          <p>Seleccionar y asignar exámenes a pacientes</p>
+        </div>
+
+        <div class="tool-card tertiary" (click)="gestionarCitas()">
+          <div class="tool-icon">📅</div>
+          <h4>Gestionar Citas</h4>
+          <p>Programar y administrar citas médicas</p>
+        </div>
+
+        <div class="tool-card" (click)="gestionarAnalisis()">
           <div class="tool-icon">🔬</div>
-          <h4>Gestión de Exámenes</h4>
-          <p>Administrar tipos y resultados de exámenes</p>
+          <h4>Gestionar Análisis</h4>
+          <p>CRUD de tipos de análisis/exámenes</p>
+        </div>
+
+        <div class="tool-card" (click)="gestionarLaboratorios()">
+          <div class="tool-icon">🏥</div>
+          <h4>Gestionar Laboratorios</h4>
+          <p>CRUD de laboratorios disponibles</p>
         </div>
 
         <div class="tool-card" (click)="gestionarResultados()">
@@ -88,12 +88,6 @@
           <div class="tool-icon">⚙️</div>
           <h4>Configuración</h4>
           <p>Configurar parámetros del sistema</p>
-        </div>
-
-        <div class="tool-card">
-          <div class="tool-icon">🏥</div>
-          <h4>Clínicas</h4>
-          <p>Gestionar información de clínicas</p>
         </div>
       </div>
     </section>
@@ -160,4 +154,368 @@
       <p>Panel de Administración - Versión 1.0.0</p>
     </div>
   </footer>
+</div>
+
+<!-- Modal de Gestión de Análisis -->
+<div *ngIf="showAnalisisModal" class="modal-backdrop" (click)="closeAnalisisModal()">
+  <div class="modal-content-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>🔬 Gestión de Análisis</h3>
+      <button class="btn-close-modal" (click)="closeAnalisisModal()">✖</button>
+    </div>
+    
+    <div class="modal-body-large">
+      <!-- Tabs -->
+      <div class="tabs">
+        <button 
+          [class.active]="analisisActiveTab === 'list'" 
+          (click)="analisisActiveTab = 'list'; loadAnalisis()">
+          📋 Lista
+        </button>
+        <button 
+          [class.active]="analisisActiveTab === 'create'" 
+          (click)="analisisActiveTab = 'create'; resetAnalisisForm()">
+          ➕ Crear
+        </button>
+        <button 
+          [class.active]="analisisActiveTab === 'search'" 
+          (click)="analisisActiveTab = 'search'">
+          🔍 Buscar por ID
+        </button>
+      </div>
+
+      <!-- Mensajes -->
+      <div *ngIf="analisisSuccessMessage" class="alert alert-success mt-3">
+        {{ analisisSuccessMessage }}
+      </div>
+      <div *ngIf="analisisErrorMessage" class="alert alert-danger mt-3">
+        {{ analisisErrorMessage }}
+      </div>
+
+      <!-- Tab: Lista -->
+      <div *ngIf="analisisActiveTab === 'list'" class="tab-content">
+        <div *ngIf="loadingAnalisis" class="text-center p-4">
+          <div class="spinner-border"></div>
+        </div>
+        
+        <div *ngIf="!loadingAnalisis" class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of analisisList">
+                <td>{{ item.id }}</td>
+                <td>{{ item.nombre }}</td>
+                <td>{{ item.descripcion }}</td>
+                <td>
+                  <button class="btn btn-sm btn-warning me-2" (click)="editAnalisis(item)">
+                    ✏️ Editar
+                  </button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteAnalisis(item.id)">
+                    🗑️ Eliminar
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="analisisList.length === 0">
+                <td colspan="4" class="text-center">No hay análisis registrados</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Crear/Editar -->
+      <div *ngIf="analisisActiveTab === 'create'" class="tab-content">
+        <form>
+          <div class="form-group mb-3">
+            <label for="analisisNombre">Nombre del Análisis *</label>
+            <input 
+              type="text" 
+              id="analisisNombre" 
+              class="form-control" 
+              [(ngModel)]="currentAnalisis.nombre"
+              name="nombre"
+              placeholder="Ej: Hemograma Completo">
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="analisisDescripcion">Descripción *</label>
+            <textarea 
+              id="analisisDescripcion" 
+              class="form-control" 
+              [(ngModel)]="currentAnalisis.descripcion"
+              name="descripcion"
+              rows="3"
+              placeholder="Describe el análisis..."></textarea>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button 
+              type="button"
+              class="btn btn-primary" 
+              (click)="saveAnalisis()"
+              [disabled]="loadingAnalisis || !currentAnalisis.nombre || !currentAnalisis.descripcion">
+              <span *ngIf="loadingAnalisis" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isEditingAnalisis ? '💾 Actualizar' : '➕ Crear' }}
+            </button>
+            <button 
+              type="button"
+              class="btn btn-secondary" 
+              (click)="resetAnalisisForm()">
+              🔄 Limpiar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tab: Buscar -->
+      <div *ngIf="analisisActiveTab === 'search'" class="tab-content">
+        <div class="form-group mb-3">
+          <label for="analisisSearchId">ID del Análisis</label>
+          <div class="input-group">
+            <input 
+              type="number" 
+              id="analisisSearchId" 
+              class="form-control" 
+              [(ngModel)]="searchAnalisisId"
+              placeholder="Ingresa el ID...">
+            <button 
+              class="btn btn-primary" 
+              (click)="searchAnalisisById()"
+              [disabled]="loadingAnalisis || !searchAnalisisId">
+              <span *ngIf="loadingAnalisis" class="spinner-border spinner-border-sm me-2"></span>
+              🔍 Buscar
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="searchedAnalisis" class="card p-3">
+          <h5>Resultado de la búsqueda:</h5>
+          <p><strong>ID:</strong> {{ searchedAnalisis.id }}</p>
+          <p><strong>Nombre:</strong> {{ searchedAnalisis.nombre }}</p>
+          <p><strong>Descripción:</strong> {{ searchedAnalisis.descripcion }}</p>
+          <div class="mt-3">
+            <button class="btn btn-warning me-2" (click)="editAnalisis(searchedAnalisis)">
+              ✏️ Editar
+            </button>
+            <button class="btn btn-danger" (click)="deleteAnalisis(searchedAnalisis.id)">
+              🗑️ Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Gestión de Laboratorios -->
+<div *ngIf="showLaboratoriosModal" class="modal-backdrop" (click)="closeLaboratoriosModal()">
+  <div class="modal-content-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>🏥 Gestión de Laboratorios</h3>
+      <button class="btn-close-modal" (click)="closeLaboratoriosModal()">✖</button>
+    </div>
+    
+    <div class="modal-body-large">
+      <!-- Tabs -->
+      <div class="tabs">
+        <button 
+          [class.active]="laboratoriosActiveTab === 'list'" 
+          (click)="laboratoriosActiveTab = 'list'; loadLaboratorios()">
+          📋 Lista
+        </button>
+        <button 
+          [class.active]="laboratoriosActiveTab === 'create'" 
+          (click)="laboratoriosActiveTab = 'create'; resetLaboratorioForm()">
+          ➕ Crear
+        </button>
+        <button 
+          [class.active]="laboratoriosActiveTab === 'search'" 
+          (click)="laboratoriosActiveTab = 'search'">
+          🔍 Buscar por ID
+        </button>
+      </div>
+
+      <!-- Mensajes -->
+      <div *ngIf="laboratoriosSuccessMessage" class="alert alert-success mt-3">
+        {{ laboratoriosSuccessMessage }}
+      </div>
+      <div *ngIf="laboratoriosErrorMessage" class="alert alert-danger mt-3">
+        {{ laboratoriosErrorMessage }}
+      </div>
+
+      <!-- Tab: Lista -->
+      <div *ngIf="laboratoriosActiveTab === 'list'" class="tab-content">
+        <div *ngIf="loadingLaboratorios" class="text-center p-4">
+          <div class="spinner-border"></div>
+        </div>
+        
+        <div *ngIf="!loadingLaboratorios" class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Teléfono</th>
+                <th>Ubicación</th>
+                <th>Capacidad</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let lab of laboratoriosList">
+                <td>{{ lab.id }}</td>
+                <td>{{ lab.nombre }}</td>
+                <td>{{ lab.direccion }}</td>
+                <td>{{ lab.telefono || 'N/A' }}</td>
+                <td>{{ lab.ubicacion || 'N/A' }}</td>
+                <td>{{ lab.capacidad || 'N/A' }}</td>
+                <td>
+                  <button class="btn btn-sm btn-warning me-2" (click)="editLaboratorio(lab)">
+                    ✏️ Editar
+                  </button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteLaboratorio(lab.id)">
+                    🗑️ Eliminar
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="laboratoriosList.length === 0">
+                <td colspan="7" class="text-center">No hay laboratorios registrados</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Crear/Editar -->
+      <div *ngIf="laboratoriosActiveTab === 'create'" class="tab-content">
+        <form>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="labNombre">Nombre del Laboratorio *</label>
+                <input 
+                  type="text" 
+                  id="labNombre" 
+                  class="form-control" 
+                  [(ngModel)]="currentLaboratorio.nombre"
+                  name="nombre"
+                  placeholder="Ej: Laboratorio Central">
+              </div>
+
+              <div class="form-group mb-3">
+                <label for="labDireccion">Dirección *</label>
+                <input 
+                  type="text" 
+                  id="labDireccion" 
+                  class="form-control" 
+                  [(ngModel)]="currentLaboratorio.direccion"
+                  name="direccion"
+                  placeholder="Ej: Av. Principal 123">
+              </div>
+
+              <div class="form-group mb-3">
+                <label for="labTelefono">Teléfono</label>
+                <input 
+                  type="text" 
+                  id="labTelefono" 
+                  class="form-control" 
+                  [(ngModel)]="currentLaboratorio.telefono"
+                  name="telefono"
+                  placeholder="Ej: +56 2 2345 6789">
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="labUbicacion">Ubicación</label>
+                <input 
+                  type="text" 
+                  id="labUbicacion" 
+                  class="form-control" 
+                  [(ngModel)]="currentLaboratorio.ubicacion"
+                  name="ubicacion"
+                  placeholder="Ej: Santiago Centro">
+              </div>
+
+              <div class="form-group mb-3">
+                <label for="labCapacidad">Capacidad</label>
+                <input 
+                  type="number" 
+                  id="labCapacidad" 
+                  class="form-control" 
+                  [(ngModel)]="currentLaboratorio.capacidad"
+                  name="capacidad"
+                  placeholder="Ej: 50">
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button 
+              type="button"
+              class="btn btn-primary" 
+              (click)="saveLaboratorio()"
+              [disabled]="loadingLaboratorios || !currentLaboratorio.nombre || !currentLaboratorio.direccion">
+              <span *ngIf="loadingLaboratorios" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isEditingLaboratorio ? '💾 Actualizar' : '➕ Crear' }}
+            </button>
+            <button 
+              type="button"
+              class="btn btn-secondary" 
+              (click)="resetLaboratorioForm()">
+              🔄 Limpiar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tab: Buscar -->
+      <div *ngIf="laboratoriosActiveTab === 'search'" class="tab-content">
+        <div class="form-group mb-3">
+          <label for="labSearchId">ID del Laboratorio</label>
+          <div class="input-group">
+            <input 
+              type="number" 
+              id="labSearchId" 
+              class="form-control" 
+              [(ngModel)]="searchLaboratorioId"
+              placeholder="Ingresa el ID...">
+            <button 
+              class="btn btn-primary" 
+              (click)="searchLaboratorioById()"
+              [disabled]="loadingLaboratorios || !searchLaboratorioId">
+              <span *ngIf="loadingLaboratorios" class="spinner-border spinner-border-sm me-2"></span>
+              🔍 Buscar
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="searchedLaboratorio" class="card p-3">
+          <h5>Resultado de la búsqueda:</h5>
+          <p><strong>ID:</strong> {{ searchedLaboratorio.id }}</p>
+          <p><strong>Nombre:</strong> {{ searchedLaboratorio.nombre }}</p>
+          <p><strong>Dirección:</strong> {{ searchedLaboratorio.direccion }}</p>
+          <p><strong>Teléfono:</strong> {{ searchedLaboratorio.telefono || 'N/A' }}</p>
+          <p><strong>Ubicación:</strong> {{ searchedLaboratorio.ubicacion || 'N/A' }}</p>
+          <p><strong>Capacidad:</strong> {{ searchedLaboratorio.capacidad || 'N/A' }}</p>
+          <div class="mt-3">
+            <button class="btn btn-warning me-2" (click)="editLaboratorio(searchedLaboratorio)">
+              ✏️ Editar
+            </button>
+            <button class="btn btn-danger" (click)="deleteLaboratorio(searchedLaboratorio.id)">
+              🗑️ Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

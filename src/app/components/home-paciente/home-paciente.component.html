@@ -36,22 +36,22 @@
     <section class="actions-section">
       <h3>Acciones Rápidas</h3>
       <div class="actions-grid">
-        <div class="action-card primary" (click)="agendarCita()">
+        <div class="action-card primary" (click)="solicitarExamen()">
           <div class="action-icon">📅</div>
-          <h4>Agendar Cita</h4>
-          <p>Programa una nueva cita médica</p>
+          <h4>Solicitar Examen</h4>
+          <p>Agenda un nuevo examen médico</p>
         </div>
 
-        <div class="action-card secondary" (click)="verExamenes()">
+        <div class="action-card secondary" (click)="consultarExamenes()">
           <div class="action-icon">🔬</div>
-          <h4>Mis Exámenes</h4>
-          <p>Consulta tus exámenes programados</p>
+          <h4>Consultar Exámenes</h4>
+          <p>Revisa y gestiona tus exámenes</p>
         </div>
 
-        <div class="action-card tertiary" (click)="verResultados()">
-          <div class="action-icon">📊</div>
-          <h4>Resultados</h4>
-          <p>Revisa los resultados de tus exámenes</p>
+        <div class="action-card tertiary" (click)="cancelarExamen()">
+          <div class="action-icon">❌</div>
+          <h4>Cancelar Examen</h4>
+          <p>Cancela un examen programado</p>
         </div>
       </div>
     </section>
@@ -60,10 +60,10 @@
     <section class="services-section">
       <h3>Servicios Disponibles</h3>
       <div class="services-grid">
-        <div class="service-card" (click)="verCitas()">
-          <div class="service-icon">🗓️</div>
-          <h4>Mis Citas</h4>
-          <p>Ver y gestionar citas médicas</p>
+        <div class="service-card" (click)="verResultados()">
+          <div class="action-icon">📊</div>
+          <h4>Resultados</h4>
+          <p>Revisa los resultados de tus exámenes</p>
         </div>
 
         <div class="service-card" (click)="verHistorial()">

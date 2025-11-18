@@ -1,0 +1,32 @@
+<div class="container mt-4">
+  <h2>Mis Citas Agendadas</h2>
+  <p>Aquí puedes ver y gestionar tus próximas citas.</p>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="!loading && !error" class="citas-list">
+    <div *ngIf="(citas$ | async)?.length === 0" class="alert alert-info">
+      No tienes citas agendadas por el momento.
+    </div>
+
+    <div *ngFor="let cita of citas$ | async" class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">{{ cita.nombreAnalisis }}</h5>
+        <p class="card-text">
+          <strong>Laboratorio:</strong> {{ cita.nombreLaboratorio }}<br>
+          <strong>Fecha:</strong> {{ cita.fecha | date:'dd/MM/yyyy' }}<br>
+          <strong>Hora:</strong> {{ cita.hora }}
+        </p>
+        <button class="btn btn-danger" (click)="cancelarCita(cita.id!)">
+          Cancelar Cita
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

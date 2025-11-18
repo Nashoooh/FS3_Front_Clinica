@@ -5,6 +5,8 @@ import { RegistroComponent } from './components/registro/registro.component';
 import { RecuperarPasswordComponent } from './components/recuperar-password/recuperar-password.component';
 import { HomePacienteComponent } from './components/home-paciente/home-paciente.component';
 import { HomeTrabajadorComponent } from './components/home-trabajador/home-trabajador.component';
+import { AgendarCitaComponent } from './components/agendar-cita/agendar-cita.component';
+import { ConsultarCitasComponent } from './components/consultar-citas/consultar-citas.component';
 
 export const routes: Routes = [
   // Rutas públicas (sin autenticación)
@@ -20,8 +22,17 @@ export const routes: Routes = [
     path: '', 
     canActivate: [AuthGuard],
     children: [
+      // Rutas del paciente
       { path: 'home-paciente', component: HomePacienteComponent, title: 'Portal del Paciente - Clinimed' },
+      { path: 'paciente/agendar-cita', component: AgendarCitaComponent, title: 'Agendar Cita - Clinimed' },
+      { path: 'paciente/consultar-citas', component: ConsultarCitasComponent, title: 'Mis Citas - Clinimed' },
+      
+      // Rutas del trabajador
       { path: 'home-trabajador', component: HomeTrabajadorComponent, title: 'Portal del Trabajador - Clinimed' },
+
+      // Rutas legacy (mantener por compatibilidad)
+      { path: 'agendar-cita', redirectTo: 'paciente/agendar-cita' },
+      { path: 'consultar-citas', redirectTo: 'paciente/consultar-citas' },
     ]
   },
 

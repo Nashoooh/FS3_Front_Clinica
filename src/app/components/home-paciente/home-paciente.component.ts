@@ -48,20 +48,16 @@ export class HomePacienteComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  // Métodos para futuras funcionalidades
-  verCitas(): void {
-    // TODO: Implementar navegación a citas
-    console.log('Navegando a citas...');
+  solicitarExamen(): void {
+    this.router.navigate(['/paciente/agendar-cita']);
   }
 
-  agendarCita(): void {
-    // TODO: Implementar navegación a agendar cita
-    console.log('Navegando a agendar cita...');
+  consultarExamenes(): void {
+    this.router.navigate(['/paciente/consultar-citas']);
   }
 
-  verExamenes(): void {
-    // TODO: Implementar navegación a exámenes
-    console.log('Navegando a exámenes...');
+  cancelarExamen(): void {
+    this.router.navigate(['/paciente/consultar-citas']);
   }
 
   verResultados(): void {
@@ -69,13 +65,13 @@ export class HomePacienteComponent implements OnInit {
     console.log('Navegando a resultados...');
   }
 
-  editarPerfil(): void {
-    // TODO: Implementar edición de perfil
-    console.log('Editando perfil...');
+  verHistorial(): void {
+    // TODO: Implementar navegación a historial
+    console.log('Navegando a historial...');
   }
 
-  verHistorial(): void {
-    // TODO: Implementar historial médico
-    console.log('Navegando a historial médico...');
+  editarPerfil(): void {
+    // TODO: Implementar navegación a perfil
+    console.log('Navegando a perfil...');
   }
 }
