@@ -43,15 +43,15 @@
         </div>
 
         <div class="action-card secondary" (click)="consultarExamenes()">
-          <div class="action-icon">🔬</div>
-          <h4>Consultar Exámenes</h4>
-          <p>Revisa y gestiona tus exámenes</p>
+          <div class="action-icon">�</div>
+          <h4>Consultar Reservas</h4>
+          <p>Revisa tus reservas de exámenes</p>
         </div>
 
         <div class="action-card tertiary" (click)="cancelarExamen()">
           <div class="action-icon">❌</div>
-          <h4>Cancelar Examen</h4>
-          <p>Cancela un examen programado</p>
+          <h4>Anular Reservas</h4>
+          <p>Cancela una reserva de examen</p>
         </div>
       </div>
     </section>
@@ -118,4 +118,204 @@
       <p>Versión 1.0.0</p>
     </div>
   </footer>
+</div>
+
+<!-- ========== MODAL SOLICITAR EXAMEN ========== -->
+<div class="modal-overlay" *ngIf="showSolicitarModal" (click)="closeSolicitarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Solicitar Examen</h2>
+      <button class="close-btn" (click)="closeSolicitarModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <form (ngSubmit)="enviarSolicitud()">
+        <div class="form-group">
+          <label for="analisis">Tipo de Examen *</label>
+          <select 
+            id="analisis" 
+            [(ngModel)]="nuevaSolicitud.analisisId" 
+            name="analisis"
+            class="form-control"
+            [disabled]="loading"
+            required>
+            <option value="0">{{ loading ? 'Cargando...' : 'Selecciona un examen' }}</option>
+            <option *ngFor="let analisis of analisisList" [value]="analisis.id">
+              {{ analisis.nombre }} - {{ analisis.descripcion }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="laboratorio">Laboratorio *</label>
+          <select 
+            id="laboratorio" 
+            [(ngModel)]="nuevaSolicitud.laboratorioId" 
+            name="laboratorio"
+            class="form-control"
+            [disabled]="loading"
+            required>
+            <option value="0">{{ loading ? 'Cargando...' : 'Selecciona un laboratorio' }}</option>
+            <option *ngFor="let lab of laboratoriosList" [value]="lab.id">
+              {{ lab.nombre }} - {{ lab.direccion }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fecha">Fecha *</label>
+            <input 
+              type="date" 
+              id="fecha" 
+              [(ngModel)]="nuevaSolicitud.fecha" 
+              name="fecha"
+              class="form-control"
+              [disabled]="loading"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="hora">Hora *</label>
+            <input 
+              type="time" 
+              id="hora" 
+              [(ngModel)]="nuevaSolicitud.hora" 
+              name="hora"
+              class="form-control"
+              [disabled]="loading"
+              required>
+          </div>
+        </div>
+
+        <div *ngIf="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+
+        <div *ngIf="successMessage" class="alert alert-success">
+          {{ successMessage }}
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeSolicitarModal()" [disabled]="loading">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <span *ngIf="loading">Enviando...</span>
+            <span *ngIf="!loading">Solicitar Examen</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL CONSULTAR RESERVAS ========== -->
+<div class="modal-overlay" *ngIf="showConsultarModal" (click)="closeConsultarModal()">
+  <div class="modal-content large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Mis Reservas de Exámenes</h2>
+      <button class="close-btn" (click)="closeConsultarModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="loading" class="loading-spinner">Cargando reservas...</div>
+
+      <div *ngIf="!loading && misSolicitudes.length === 0" class="empty-state">
+        <p>No tienes reservas de exámenes</p>
+      </div>
+
+      <div *ngIf="!loading && misSolicitudes.length > 0" class="solicitudes-list">
+        <div class="solicitud-item" *ngFor="let solicitud of misSolicitudes">
+          <div class="solicitud-header">
+            <span class="solicitud-id">Reserva #{{ solicitud.id }}</span>
+            <span class="solicitud-fecha">{{ solicitud.fecha }} - {{ solicitud.hora }}</span>
+          </div>
+          <div class="solicitud-details">
+            <div class="detail-row">
+              <strong>Examen:</strong>
+              <span>{{ solicitud.analisis?.nombre || getNombreAnalisis(solicitud.analisisId) }}</span>
+            </div>
+            <div class="detail-row">
+              <strong>Laboratorio:</strong>
+              <span>{{ solicitud.laboratorio?.nombre || getNombreLaboratorio(solicitud.laboratorioId) }}</span>
+            </div>
+            <div class="detail-row" *ngIf="solicitud.laboratorio?.direccion">
+              <strong>Dirección:</strong>
+              <span>{{ solicitud.laboratorio.direccion }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeConsultarModal()">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL ANULAR RESERVAS ========== -->
+<div class="modal-overlay" *ngIf="showAnularModal" (click)="closeAnularModal()">
+  <div class="modal-content large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Anular Reservas</h2>
+      <button class="close-btn" (click)="closeAnularModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="loading" class="loading-spinner">Cargando reservas...</div>
+
+      <div *ngIf="!loading && misSolicitudes.length === 0" class="empty-state">
+        <p>No tienes reservas para anular</p>
+      </div>
+
+      <div *ngIf="!loading && misSolicitudes.length > 0" class="solicitudes-list">
+        <div class="solicitud-item" *ngFor="let solicitud of misSolicitudes">
+          <div class="solicitud-header">
+            <span class="solicitud-id">Reserva #{{ solicitud.id }}</span>
+            <span class="solicitud-fecha">{{ solicitud.fecha }} - {{ solicitud.hora }}</span>
+          </div>
+          <div class="solicitud-details">
+            <div class="detail-row">
+              <strong>Examen:</strong>
+              <span>{{ solicitud.analisis?.nombre || getNombreAnalisis(solicitud.analisisId) }}</span>
+            </div>
+            <div class="detail-row">
+              <strong>Laboratorio:</strong>
+              <span>{{ solicitud.laboratorio?.nombre || getNombreLaboratorio(solicitud.laboratorioId) }}</span>
+            </div>
+          </div>
+          <div class="solicitud-actions">
+            <button 
+              class="btn btn-danger btn-sm" 
+              (click)="anularSolicitud(solicitud.id)"
+              [disabled]="loading">
+              Anular Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="successMessage" class="alert alert-success">
+        {{ successMessage }}
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeAnularModal()">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

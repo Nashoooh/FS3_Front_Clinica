@@ -20,6 +20,9 @@ export interface SolicitudAnalisis {
   laboratorioId: number;
   fecha: string; // Formato YYYY-MM-DD
   hora: string; // Formato HH:MM
+  usuario?: any; // Objeto usuario completo del backend
+  analisis?: any; // Objeto análisis completo del backend
+  laboratorio?: any; // Objeto laboratorio completo del backend
 }
 
 // Para mostrar la información de forma más amigable
