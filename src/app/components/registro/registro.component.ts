@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { CatalogosService } from '../../services/catalogos.service';
 import { Usuario } from '../../models/usuario.model';
+import { Prevision, Rol } from '../../models/prevision-rol.model';
 
 @Component({
   selector: 'app-registro',
@@ -12,15 +14,19 @@ import { Usuario } from '../../models/usuario.model';
   templateUrl: './registro.component.html',
   styleUrl: './registro.component.css'
 })
-export class RegistroComponent {
+export class RegistroComponent implements OnInit {
   registroForm: FormGroup;
   loading = false;
   errorMessage = '';
   successMessage = '';
+  previsiones: Prevision[] = [];
+  roles: Rol[] = [];
+  loadingCatalogos = true;
 
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
+    private catalogosService: CatalogosService,
     private router: Router
   ) {
     this.registroForm = this.formBuilder.group({
@@ -34,8 +40,39 @@ export class RegistroComponent {
       fechaNacimiento: ['', [Validators.required]],
       genero: ['', [Validators.required]],
       direccion: ['', [Validators.required]],
-      rol: [1, [Validators.required]] // Por defecto paciente
+      previsionId: ['', [Validators.required]],
+      rolId: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
+  }
+
+  ngOnInit(): void {
+    this.cargarCatalogos();
+  }
+
+  cargarCatalogos(): void {
+    this.loadingCatalogos = true;
+    
+    // Cargar previsiones y roles en paralelo
+    Promise.all([
+      this.catalogosService.getPrevisiones().toPromise(),
+      this.catalogosService.getRoles().toPromise()
+    ]).then(([previsiones, roles]) => {
+      this.previsiones = previsiones || [];
+      this.roles = roles || [];
+      this.loadingCatalogos = false;
+      
+      // Establecer rol por defecto (Paciente = 1)
+      if (this.roles.length > 0) {
+        const rolPaciente = this.roles.find(r => r.id === 1);
+        if (rolPaciente) {
+          this.registroForm.patchValue({ rolId: rolPaciente.id });
+        }
+      }
+    }).catch(error => {
+      console.error('Error al cargar catálogos:', error);
+      this.errorMessage = 'Error al cargar la información del formulario. Por favor, recarga la página.';
+      this.loadingCatalogos = false;
+    });
   }
 
   get f() { return this.registroForm.controls; }
@@ -59,6 +96,7 @@ export class RegistroComponent {
           control.markAsTouched();
         }
       });
+      this.errorMessage = 'Por favor, completa todos los campos requeridos correctamente.';
       return;
     }
 
@@ -67,24 +105,46 @@ export class RegistroComponent {
     this.successMessage = '';
 
     const formData = this.registroForm.value;
-    delete formData.confirmPassword; // No enviar confirmPassword al backend
-
-    const usuario: Usuario = {
-      ...formData,
-      activo: true
+    
+    // Construir el payload según el backend espera
+    const payload = {
+      nombre: formData.nombre,
+      apellido: formData.apellido,
+      email: formData.email,
+      password: formData.password,
+      telefono: formData.telefono,
+      rut: formData.rut,
+      fechaNacimiento: formData.fechaNacimiento,
+      genero: formData.genero,
+      direccion: formData.direccion,
+      rol: {
+        id: parseInt(formData.rolId),
+        nombre: this.roles.find(r => r.id === parseInt(formData.rolId))?.nombre || ''
+      },
+      prevision: {
+        id: parseInt(formData.previsionId),
+        nombre: this.previsiones.find(p => p.id === parseInt(formData.previsionId))?.nombre || ''
+      }
+      // No enviamos 'activo' - el backend lo establece automáticamente en true
     };
 
-    this.authService.register(usuario).subscribe({
+    this.authService.register(payload as any).subscribe({
       next: (response) => {
         this.loading = false;
-        this.successMessage = 'Usuario registrado exitosamente';
+        this.successMessage = 'Usuario registrado exitosamente. Redirigiendo al login...';
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 2000);
       },
       error: (error) => {
         this.loading = false;
-        this.errorMessage = 'Error al registrar usuario. Por favor, intenta nuevamente.';
+        if (error.status === 400) {
+          this.errorMessage = error.error?.message || 'Datos inválidos. Verifica que el email no esté registrado.';
+        } else if (error.status === 409) {
+          this.errorMessage = 'El email o RUT ya está registrado en el sistema.';
+        } else {
+          this.errorMessage = 'Error al registrar usuario. Por favor, intenta nuevamente.';
+        }
         console.error('Error de registro:', error);
       }
     });
