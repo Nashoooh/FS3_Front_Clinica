@@ -112,23 +112,33 @@ export class AuthService {
     return user ? user.rol.nombre : null;
   }
 
-  // Método para recuperar contraseña (verificar si el email existe)
+  // Método para verificar si el email existe
   checkEmailExists(email: string): Observable<boolean> {
-    return this.http.get<Usuario[]>(this.apiUrl)
-      .pipe(map(usuarios => usuarios.some(user => user.email === email)));
+    return this.http.post<{ exists: boolean; email: string }>(
+      `${environment.apiUsuarios}/usuarios/verify-email`,
+      { email }
+    ).pipe(
+      map(response => response.exists),
+      catchError(error => {
+        if (error.status === 404) {
+          return of(false);
+        }
+        throw error;
+      })
+    );
   }
 
-  // Método para actualizar contraseña (simulado por ahora)
+  // Método para cambiar contraseña
   resetPassword(email: string, newPassword: string): Observable<any> {
-    // En un escenario real, esto sería un endpoint específico
-    return this.http.get<Usuario[]>(this.apiUrl)
-      .pipe(map(usuarios => {
-        const user = usuarios.find(u => u.email === email);
-        if (user) {
-          // Aquí normalmente harías un PUT al backend con la nueva contraseña
-          return { success: true, message: 'Contraseña actualizada correctamente' };
-        }
-        return { success: false, message: 'Usuario no encontrado' };
-      }));
+    return this.http.post(
+      `${environment.apiUsuarios}/usuarios/change-password`,
+      { email, newPassword }
+    ).pipe(
+      map(() => ({ success: true, message: 'Contraseña actualizada correctamente' })),
+      catchError(error => {
+        console.error('Error al cambiar contraseña:', error);
+        return of({ success: false, message: 'Error al actualizar la contraseña' });
+      })
+    );
   }
 }
