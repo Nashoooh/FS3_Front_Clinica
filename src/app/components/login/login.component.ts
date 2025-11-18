@@ -40,19 +40,25 @@ export class LoginComponent {
     const { email, password } = this.loginForm.value;
 
     this.authService.login(email, password).subscribe({
-      next: (user) => {
+      next: (response) => {
+        console.log('✅ Login exitoso:', response);
         this.loading = false;
-        // Redirigir según el rol
-        if (user.rol === 1) {
+        
+        // Redirigir según el rol que viene en la respuesta
+        if (response.rol === 1) {
           this.router.navigate(['/home-paciente']);
-        } else if (user.rol === 2) {
+        } else if (response.rol === 2) {
           this.router.navigate(['/home-trabajador']);
+        } else {
+          // Si el rol no es reconocido, cerrar sesión
+          this.authService.logout();
+          this.errorMessage = 'Rol de usuario no reconocido.';
         }
       },
       error: (error) => {
         this.loading = false;
         this.errorMessage = 'Credenciales inválidas. Por favor, intenta nuevamente.';
-        console.error('Error de login:', error);
+        console.error('❌ Error de login:', error);
       }
     });
   }

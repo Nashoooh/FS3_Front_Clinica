@@ -7,40 +7,11 @@ import { HomePacienteComponent } from './components/home-paciente/home-paciente.
 import { HomeTrabajadorComponent } from './components/home-trabajador/home-trabajador.component';
 
 export const routes: Routes = [
-  { 
-    path: '', 
-    redirectTo: 'login', 
-    pathMatch: 'full' 
-  },
-  { 
-    path: 'login', 
-    component: LoginComponent,
-    title: 'Iniciar Sesión - Clinimed'
-  },
-  { 
-    path: 'registro', 
-    component: RegistroComponent,
-    title: 'Registro - Clinimed'
-  },
-  { 
-    path: 'recuperar-password', 
-    component: RecuperarPasswordComponent,
-    title: 'Recuperar Contraseña - Clinimed'
-  },
-  { 
-    path: 'home-paciente', 
-    component: HomePacienteComponent,
-    canActivate: [AuthGuard],
-    title: 'Portal del Paciente - Clinimed'
-  },
-  { 
-    path: 'home-trabajador', 
-    component: HomeTrabajadorComponent,
-    canActivate: [AuthGuard],
-    title: 'Portal del Trabajador - Clinimed'
-  },
-  { 
-    path: '**', 
-    redirectTo: 'login' 
-  }
+  { path: 'login', component: LoginComponent, title: 'Iniciar Sesión - Clinimed' },
+  { path: 'registro', component: RegistroComponent, title: 'Registro - Clinimed' },
+  { path: 'recuperar-password', component: RecuperarPasswordComponent, title: 'Recuperar Contraseña - Clinimed' },
+  { path: 'home-paciente', component: HomePacienteComponent, canActivate: [AuthGuard], title: 'Portal del Paciente - Clinimed' },
+  { path: 'home-trabajador', component: HomeTrabajadorComponent, canActivate: [AuthGuard], title: 'Portal del Trabajador - Clinimed' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '**', redirectTo: 'login' }
 ];

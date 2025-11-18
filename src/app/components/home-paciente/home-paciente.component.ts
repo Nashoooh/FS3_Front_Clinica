@@ -21,7 +21,12 @@ export class HomePacienteComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.usuario = this.authService.currentUserValue;
+    // Suscribirse al usuario actual
+    this.authService.currentUser.subscribe(user => {
+      this.usuario = user;
+      console.log('👤 Usuario en home-paciente:', user);
+    });
+    
     this.updateTime();
     setInterval(() => this.updateTime(), 1000);
   }

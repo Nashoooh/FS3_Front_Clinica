@@ -1,16 +1,20 @@
 export interface Usuario {
   id?: number;
   nombre: string;
-  apellido: string;
+  apellido?: string;
   email: string;
   password?: string;
-  telefono: string;
+  telefono?: string;
   rut: string;
-  fechaNacimiento: string;
-  genero: string;
-  direccion: string;
-  rol: number; // 1: Paciente, 2: Trabajador
+  fechaNacimiento?: string;
+  genero?: string;
+  direccion?: string;
+  rol: {
+    id: number;
+    nombre: string;
+  };
   activo?: boolean;
+  prevision?: any;
 }
 
 export interface LoginRequest {
@@ -19,6 +23,11 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  usuario: Usuario;
-  token?: string;
+  token: string;
+  id: number;
+  email: string;
+  nombre: string;
+  rut: string;
+  rol: number;
+  rolNombre: string;
 }
