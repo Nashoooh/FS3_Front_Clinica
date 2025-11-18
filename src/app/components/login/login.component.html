@@ -51,13 +51,13 @@
 
     <div class="login-footer">
       <p>
-        <a href="#" (click)="goToForgotPassword()" class="forgot-password">
+        <a href="" (click)="goToForgotPassword(); $event.preventDefault()" class="forgot-password">
           ¿Olvidaste tu contraseña?
         </a>
       </p>
       <p>
         ¿No tienes cuenta? 
-        <a href="#" (click)="goToRegister()" class="register-link">
+        <a href="" (click)="goToRegister(); $event.preventDefault()" class="register-link">
           Regístrate aquí
         </a>
       </p>

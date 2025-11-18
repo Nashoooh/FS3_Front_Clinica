@@ -28,6 +28,6 @@ export interface LoginResponse {
   email: string;
   nombre: string;
   rut: string;
-  rol: number;
+  rolId: number; // Corregido de 'rol' a 'rolId'
   rolNombre: string;
 }

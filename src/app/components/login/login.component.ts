@@ -44,10 +44,10 @@ export class LoginComponent {
         console.log('✅ Login exitoso:', response);
         this.loading = false;
         
-        // Redirigir según el rol que viene en la respuesta
-        if (response.rol === 1) {
+        // CORREGIDO: Usar response.rolId en lugar de response.rol
+        if (response.rolId === 1) {
           this.router.navigate(['/home-paciente']);
-        } else if (response.rol === 2) {
+        } else if (response.rolId === 2) {
           this.router.navigate(['/home-trabajador']);
         } else {
           // Si el rol no es reconocido, cerrar sesión
