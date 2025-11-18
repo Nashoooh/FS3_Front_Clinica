@@ -32,8 +32,7 @@ export class HomePacienteComponent implements OnInit {
   nuevaSolicitud = {
     analisisId: 0,
     laboratorioId: 0,
-    fecha: '',
-    hora: ''
+    fecha: ''
   };
 
   // Estados de carga y mensajes
@@ -109,8 +108,7 @@ export class HomePacienteComponent implements OnInit {
     this.nuevaSolicitud = {
       analisisId: 0,
       laboratorioId: 0,
-      fecha: '',
-      hora: ''
+      fecha: ''
     };
   }
 
@@ -121,7 +119,7 @@ export class HomePacienteComponent implements OnInit {
     }
 
     if (!this.nuevaSolicitud.analisisId || !this.nuevaSolicitud.laboratorioId || 
-        !this.nuevaSolicitud.fecha || !this.nuevaSolicitud.hora) {
+        !this.nuevaSolicitud.fecha) {
       this.errorMessage = 'Por favor completa todos los campos';
       return;
     }
@@ -129,13 +127,16 @@ export class HomePacienteComponent implements OnInit {
     this.loading = true;
     this.clearMessages();
 
+    // El backend espera objetos anidados para laboratorio y analisis
     const solicitud: any = {
       usuarioId: this.usuario.id,
-      analisisId: this.nuevaSolicitud.analisisId,
-      laboratorioId: this.nuevaSolicitud.laboratorioId,
-      fecha: this.nuevaSolicitud.fecha,
-      hora: this.nuevaSolicitud.hora
+      laboratorio: { id: parseInt(this.nuevaSolicitud.laboratorioId.toString()) },
+      analisis: { id: parseInt(this.nuevaSolicitud.analisisId.toString()) },
+      fechaSolicitud: this.nuevaSolicitud.fecha,
+      estado: 'pendiente'
     };
+
+    console.log('📤 Enviando solicitud:', solicitud);
 
     this.citasService.createSolicitud(solicitud).subscribe({
       next: () => {

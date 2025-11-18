@@ -4,7 +4,7 @@
     <div class="header-content">
       <div class="brand">
         <h1>Clinimed</h1>
-        <span class="subtitle">Portal del Paciente</span>
+        <span class="subtitle">Panel de Paciente</span>
       </div>
       <div class="user-info">
         <div class="user-details">
@@ -43,7 +43,7 @@
         </div>
 
         <div class="action-card secondary" (click)="consultarExamenes()">
-          <div class="action-icon">�</div>
+          <div class="action-icon">🔍</div>
           <h4>Consultar Reservas</h4>
           <p>Revisa tus reservas de exámenes</p>
         </div>
@@ -162,30 +162,16 @@
           </select>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="fecha">Fecha *</label>
-            <input 
-              type="date" 
-              id="fecha" 
-              [(ngModel)]="nuevaSolicitud.fecha" 
-              name="fecha"
-              class="form-control"
-              [disabled]="loading"
-              required>
-          </div>
-
-          <div class="form-group">
-            <label for="hora">Hora *</label>
-            <input 
-              type="time" 
-              id="hora" 
-              [(ngModel)]="nuevaSolicitud.hora" 
-              name="hora"
-              class="form-control"
-              [disabled]="loading"
-              required>
-          </div>
+        <div class="form-group">
+          <label for="fecha">Fecha de Solicitud *</label>
+          <input 
+            type="date" 
+            id="fecha" 
+            [(ngModel)]="nuevaSolicitud.fecha" 
+            name="fecha"
+            class="form-control"
+            [disabled]="loading"
+            required>
         </div>
 
         <div *ngIf="errorMessage" class="alert alert-danger">
@@ -229,7 +215,7 @@
         <div class="solicitud-item" *ngFor="let solicitud of misSolicitudes">
           <div class="solicitud-header">
             <span class="solicitud-id">Reserva #{{ solicitud.id }}</span>
-            <span class="solicitud-fecha">{{ solicitud.fecha }} - {{ solicitud.hora }}</span>
+            <span class="solicitud-fecha">{{ solicitud.fechaSolicitud | date:'dd/MM/yyyy' }}</span>
           </div>
           <div class="solicitud-details">
             <div class="detail-row">
@@ -243,6 +229,10 @@
             <div class="detail-row" *ngIf="solicitud.laboratorio?.direccion">
               <strong>Dirección:</strong>
               <span>{{ solicitud.laboratorio.direccion }}</span>
+            </div>
+            <div class="detail-row" *ngIf="solicitud.estado">
+              <strong>Estado:</strong>
+              <span class="badge badge-{{solicitud.estado}}">{{ solicitud.estado }}</span>
             </div>
           </div>
         </div>
@@ -280,7 +270,7 @@
         <div class="solicitud-item" *ngFor="let solicitud of misSolicitudes">
           <div class="solicitud-header">
             <span class="solicitud-id">Reserva #{{ solicitud.id }}</span>
-            <span class="solicitud-fecha">{{ solicitud.fecha }} - {{ solicitud.hora }}</span>
+            <span class="solicitud-fecha">{{ solicitud.fechaSolicitud | date:'dd/MM/yyyy' }}</span>
           </div>
           <div class="solicitud-details">
             <div class="detail-row">
@@ -290,6 +280,10 @@
             <div class="detail-row">
               <strong>Laboratorio:</strong>
               <span>{{ solicitud.laboratorio?.nombre || getNombreLaboratorio(solicitud.laboratorioId) }}</span>
+            </div>
+            <div class="detail-row" *ngIf="solicitud.estado">
+              <strong>Estado:</strong>
+              <span class="badge badge-{{solicitud.estado}}">{{ solicitud.estado }}</span>
             </div>
           </div>
           <div class="solicitud-actions">
