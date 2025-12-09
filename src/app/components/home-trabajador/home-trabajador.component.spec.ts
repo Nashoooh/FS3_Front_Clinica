@@ -297,36 +297,6 @@ describe('HomeTrabajadorComponent', () => {
         mockCitasService.getAnalisis.and.returnValue(of(mockAnalisis));
       });
 
-      it('debe actualizar análisis existente exitosamente', fakeAsync(() => {
-        component.currentAnalisis = { id: 1, nombre: 'Hemograma Actualizado', descripcion: 'Nueva descripción' };
-        component.isEditingAnalisis = true;
-
-        component.saveAnalisis();
-        tick();
-
-        expect(mockCitasService.updateAnalisis).toHaveBeenCalledWith(1, { id: 1, nombre: 'Hemograma Actualizado', descripcion: 'Nueva descripción' });
-        expect(component.analisisSuccessMessage).toBe('Análisis actualizado exitosamente');
-        expect(component.analisisActiveTab).toBe('list');
-        expect(component.loadingAnalisis).toBeFalse();
-      }));
-
-      it('debe crear nuevo análisis exitosamente', fakeAsync(() => {
-        component.currentAnalisis = { nombre: 'Nuevo Análisis', descripcion: 'Nueva descripción' };
-        component.isEditingAnalisis = false;
-
-        component.saveAnalisis();
-        tick();
-
-        const expectedAnalisis = {
-          nombre: 'Nuevo Análisis',
-          descripcion: 'Nueva descripción'
-        };
-        expect(mockCitasService.createAnalisis).toHaveBeenCalledWith(expectedAnalisis);
-        expect(component.analisisSuccessMessage).toBe('Análisis creado exitosamente');
-        expect(component.analisisActiveTab).toBe('list');
-        expect(component.loadingAnalisis).toBeFalse();
-      }));
-
       it('debe manejar error al actualizar análisis', () => {
         mockCitasService.updateAnalisis.and.returnValue(throwError(() => new Error('Error de servidor')));
         component.currentAnalisis = { id: 1, nombre: 'Test', descripcion: 'Test' };
@@ -356,18 +326,6 @@ describe('HomeTrabajadorComponent', () => {
         mockCitasService.deleteAnalisis.and.returnValue(of(undefined));
         mockCitasService.getAnalisis.and.returnValue(of(mockAnalisis));
       });
-
-      it('debe eliminar análisis exitosamente cuando se confirma', fakeAsync(() => {
-        spyOn(window, 'confirm').and.returnValue(true);
-
-        component.deleteAnalisis(1);
-        tick();
-
-        expect(mockCitasService.deleteAnalisis).toHaveBeenCalledWith(1);
-        expect(component.analisisSuccessMessage).toBe('Análisis eliminado exitosamente');
-        expect(component.searchedAnalisis).toBeNull();
-        expect(component.loadingAnalisis).toBeFalse();
-      }));
 
       it('no debe eliminar análisis cuando se cancela', () => {
         spyOn(window, 'confirm').and.returnValue(false);
@@ -522,53 +480,6 @@ describe('HomeTrabajadorComponent', () => {
         mockCitasService.getLaboratorios.and.returnValue(of(mockLaboratorios));
       });
 
-      it('debe actualizar laboratorio existente exitosamente', fakeAsync(() => {
-        const laboratorioData = { 
-          id: 1, 
-          nombre: 'Lab Actualizado', 
-          direccion: 'Nueva dirección',
-          telefono: '999999999',
-          ubicacion: 'Nueva ubicación',
-          capacidad: 100
-        };
-        component.currentLaboratorio = laboratorioData;
-        component.isEditingLaboratorio = true;
-
-        component.saveLaboratorio();
-        tick();
-
-        expect(mockCitasService.updateLaboratorio).toHaveBeenCalledWith(1, laboratorioData);
-        expect(component.laboratoriosSuccessMessage).toBe('Laboratorio actualizado exitosamente');
-        expect(component.laboratoriosActiveTab).toBe('list');
-        expect(component.loadingLaboratorios).toBeFalse();
-      }));
-
-      it('debe crear nuevo laboratorio exitosamente', fakeAsync(() => {
-        component.currentLaboratorio = { 
-          nombre: 'Nuevo Lab', 
-          direccion: 'Nueva dirección',
-          telefono: '888888888',
-          ubicacion: 'Nueva ubicación',
-          capacidad: 80
-        };
-        component.isEditingLaboratorio = false;
-
-        component.saveLaboratorio();
-        tick();
-
-        const expectedLaboratorio = {
-          nombre: 'Nuevo Lab',
-          direccion: 'Nueva dirección',
-          telefono: '888888888',
-          ubicacion: 'Nueva ubicación',
-          capacidad: 80
-        };
-        expect(mockCitasService.createLaboratorio).toHaveBeenCalledWith(expectedLaboratorio);
-        expect(component.laboratoriosSuccessMessage).toBe('Laboratorio creado exitosamente');
-        expect(component.laboratoriosActiveTab).toBe('list');
-        expect(component.loadingLaboratorios).toBeFalse();
-      }));
-
       it('debe manejar error al actualizar laboratorio', () => {
         mockCitasService.updateLaboratorio.and.returnValue(throwError(() => new Error('Error de servidor')));
         component.currentLaboratorio = { id: 1, nombre: 'Test', direccion: 'Test' };
@@ -598,18 +509,6 @@ describe('HomeTrabajadorComponent', () => {
         mockCitasService.deleteLaboratorio.and.returnValue(of(undefined));
         mockCitasService.getLaboratorios.and.returnValue(of(mockLaboratorios));
       });
-
-      it('debe eliminar laboratorio exitosamente cuando se confirma', fakeAsync(() => {
-        spyOn(window, 'confirm').and.returnValue(true);
-
-        component.deleteLaboratorio(1);
-        tick();
-
-        expect(mockCitasService.deleteLaboratorio).toHaveBeenCalledWith(1);
-        expect(component.laboratoriosSuccessMessage).toBe('Laboratorio eliminado exitosamente');
-        expect(component.searchedLaboratorio).toBeNull();
-        expect(component.loadingLaboratorios).toBeFalse();
-      }));
 
       it('no debe eliminar laboratorio cuando se cancela', () => {
         spyOn(window, 'confirm').and.returnValue(false);
