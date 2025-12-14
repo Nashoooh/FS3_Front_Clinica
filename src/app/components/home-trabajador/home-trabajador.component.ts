@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { CitasService } from '../../services/citas.service';
+import { ExamenService, Examen } from '../../services/examen.service';
 import { Usuario } from '../../models/usuario.model';
 import { Analisis, Laboratorio } from '../../models/citas.model';
 
@@ -21,6 +22,7 @@ export class HomeTrabajadorComponent implements OnInit {
   // Modales
   showAnalisisModal = false;
   showLaboratoriosModal = false;
+  showExamenesModal = false;
 
   // Análisis
   analisisActiveTab: 'list' | 'create' | 'search' = 'list';
@@ -44,10 +46,22 @@ export class HomeTrabajadorComponent implements OnInit {
   laboratoriosSuccessMessage = '';
   laboratoriosErrorMessage = '';
 
+  // Exámenes
+  examenesActiveTab: 'list' | 'create' | 'search' = 'list';
+  examenesList: Examen[] = [];
+  currentExamen: Examen = { usuarioId: 0, laboratorioId: 0, analisisId: 0, fechaExamen: '', resultado: '' };
+  searchedExamen: Examen | null = null;
+  searchExamenId: number | null = null;
+  loadingExamenes = false;
+  isEditingExamen = false;
+  examenesSuccessMessage = '';
+  examenesErrorMessage = '';
+
   constructor(
     private authService: AuthService,
     private router: Router,
-    private citasService: CitasService
+    private citasService: CitasService,
+    private examenService: ExamenService
   ) {}
 
   ngOnInit(): void {
@@ -87,11 +101,6 @@ export class HomeTrabajadorComponent implements OnInit {
   gestionarCitas(): void {
     // TODO: Implementar navegación a gestión de citas
     console.log('Navegando a gestión de citas...');
-  }
-
-  gestionarExamenes(): void {
-    // TODO: Implementar navegación a gestión de exámenes
-    console.log('Navegando a gestión de exámenes...');
   }
 
   // ========== ANÁLISIS ==========
@@ -367,12 +376,145 @@ export class HomeTrabajadorComponent implements OnInit {
     this.laboratoriosErrorMessage = '';
   }
 
-  // ========== OTROS MÉTODOS ==========
+  // ========== EXÁMENES ==========
   asignarExamenes(): void {
-    // TODO: Implementar navegación a asignación de exámenes
-    console.log('Navegando a asignación de exámenes...');
+    this.showExamenesModal = true;
+    this.examenesActiveTab = 'list';
+    this.loadExamenes();
   }
 
+  closeExamenesModal(): void {
+    this.showExamenesModal = false;
+    this.resetExamenForm();
+    this.clearExamenesMessages();
+  }
+
+  loadExamenes(): void {
+    this.loadingExamenes = true;
+    this.clearExamenesMessages();
+    this.examenService.getAll().subscribe({
+      next: (data: Examen[]) => {
+        this.examenesList = data;
+        this.loadingExamenes = false;
+      },
+      error: (error: any) => {
+        console.error('Error al cargar exámenes:', error);
+        this.examenesErrorMessage = 'Error al cargar los exámenes';
+        this.loadingExamenes = false;
+      }
+    });
+  }
+
+  resetExamenForm(): void {
+    this.currentExamen = { usuarioId: 0, laboratorioId: 0, analisisId: 0, fechaExamen: '', resultado: '' };
+    this.isEditingExamen = false;
+    this.searchedExamen = null;
+  }
+
+  editExamen(examen: Examen): void {
+    this.currentExamen = { ...examen };
+    this.isEditingExamen = true;
+    this.examenesActiveTab = 'create';
+    this.clearExamenesMessages();
+  }
+
+  saveExamen(): void {
+    this.loadingExamenes = true;
+    this.clearExamenesMessages();
+
+    if (this.isEditingExamen && this.currentExamen.id) {
+      this.examenService.update(this.currentExamen.id, this.currentExamen).subscribe({
+        next: () => {
+          this.examenesSuccessMessage = 'Examen actualizado exitosamente';
+          this.loadExamenes();
+          this.resetExamenForm();
+          this.examenesActiveTab = 'list';
+          this.loadingExamenes = false;
+        },
+        error: (error: any) => {
+          console.error('Error al actualizar:', error);
+          this.examenesErrorMessage = 'Error al actualizar el examen';
+          this.loadingExamenes = false;
+        }
+      });
+    } else {
+      // Crear un objeto sin el campo 'id' para nuevas entidades
+      const nuevoExamen: Examen = {
+        usuarioId: this.currentExamen.usuarioId,
+        laboratorioId: this.currentExamen.laboratorioId,
+        analisisId: this.currentExamen.analisisId,
+        fechaExamen: this.currentExamen.fechaExamen,
+        resultado: this.currentExamen.resultado
+        // NO se envía 'id' - el backend lo genera automáticamente
+      };
+      
+      this.examenService.create(nuevoExamen).subscribe({
+        next: () => {
+          this.examenesSuccessMessage = 'Examen creado exitosamente';
+          this.loadExamenes();
+          this.resetExamenForm();
+          this.examenesActiveTab = 'list';
+          this.loadingExamenes = false;
+        },
+        error: (error: any) => {
+          console.error('Error al crear:', error);
+          this.examenesErrorMessage = 'Error al crear el examen';
+          this.loadingExamenes = false;
+        }
+      });
+    }
+  }
+
+  deleteExamen(id: number | undefined): void {
+    if (!id) {
+      this.examenesErrorMessage = 'ID de examen inválido';
+      return;
+    }
+    
+    if (confirm('¿Estás seguro de eliminar este examen?')) {
+      this.loadingExamenes = true;
+      this.clearExamenesMessages();
+      this.examenService.delete(id).subscribe({
+        next: () => {
+          this.examenesSuccessMessage = 'Examen eliminado exitosamente';
+          this.loadExamenes();
+          this.searchedExamen = null;
+          this.loadingExamenes = false;
+        },
+        error: (error: any) => {
+          console.error('Error al eliminar:', error);
+          this.examenesErrorMessage = 'Error al eliminar el examen';
+          this.loadingExamenes = false;
+        }
+      });
+    }
+  }
+
+  searchExamenById(): void {
+    if (!this.searchExamenId) return;
+    
+    this.loadingExamenes = true;
+    this.clearExamenesMessages();
+    this.examenService.getById(this.searchExamenId).subscribe({
+      next: (data: Examen) => {
+        this.searchedExamen = data;
+        this.loadingExamenes = false;
+      },
+      error: (error: any) => {
+        console.error('Error al buscar:', error);
+        this.examenesErrorMessage = 'No se encontró el examen con ese ID';
+        this.searchedExamen = null;
+        this.loadingExamenes = false;
+      }
+    });
+  }
+
+  clearExamenesMessages(): void {
+    this.examenesSuccessMessage = '';
+    this.examenesErrorMessage = '';
+  }
+
+  // ========== OTROS MÉTODOS ==========
   verReportes(): void {
     // TODO: Implementar navegación a reportes
     console.log('Navegando a reportes...');

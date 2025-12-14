@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { CitasService } from '../../services/citas.service';
+import { ExamenService, Examen } from '../../services/examen.service';
 import { Usuario } from '../../models/usuario.model';
 import { Analisis, Laboratorio, SolicitudAnalisis } from '../../models/citas.model';
 
@@ -22,11 +23,13 @@ export class HomePacienteComponent implements OnInit {
   showSolicitarModal = false;
   showConsultarModal = false;
   showAnularModal = false;
+  showResultadosModal = false;
 
   // Listas de catálogos
   analisisList: Analisis[] = [];
   laboratoriosList: Laboratorio[] = [];
   misSolicitudes: SolicitudAnalisis[] = [];
+  examenes: Examen[] = [];
 
   // Formulario de solicitud
   nuevaSolicitud = {
@@ -40,10 +43,14 @@ export class HomePacienteComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
 
+  // Examen seleccionado para ver detalles
+  examenSeleccionado: Examen | null = null;
+
   constructor(
     private authService: AuthService,
     private router: Router,
-    private citasService: CitasService
+    private citasService: CitasService,
+    private examenService: ExamenService
   ) {}
 
   ngOnInit(): void {
@@ -223,6 +230,33 @@ export class HomePacienteComponent implements OnInit {
     });
   }
 
+  // ========== RESULTADOS DE EXÁMENES ==========
+  verResultados(): void {
+    if (!this.usuario?.id) return;
+    this.loading = true;
+    this.examenService.getByPaciente(this.usuario.id).subscribe({
+      next: (examenes) => {
+        this.examenes = examenes;
+        this.showResultadosModal = true;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar exámenes:', error);
+        this.errorMessage = 'Error al cargar los resultados';
+        this.loading = false;
+      }
+    });
+  }
+
+  cerrarResultadosModal(): void {
+    this.showResultadosModal = false;
+    this.examenSeleccionado = null;
+  }
+
+  verDetalleExamen(examen: Examen): void {
+    this.examenSeleccionado = examen;
+  }
+
   // ========== MÉTODOS AUXILIARES ==========
   clearMessages(): void {
     this.successMessage = '';
@@ -239,18 +273,13 @@ export class HomePacienteComponent implements OnInit {
     return lab?.nombre || 'Desconocido';
   }
 
-  verResultados(): void {
-    // TODO: Implementar navegación a resultados
-    console.log('Navegando a resultados...');
+  editarPerfil(): void {
+    // TODO: Implementar navegación a perfil
+    console.log('Navegando a perfil...');
   }
 
   verHistorial(): void {
     // TODO: Implementar navegación a historial
     console.log('Navegando a historial...');
-  }
-
-  editarPerfil(): void {
-    // TODO: Implementar navegación a perfil
-    console.log('Navegando a perfil...');
   }
 }

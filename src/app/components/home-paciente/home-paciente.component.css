@@ -656,3 +656,287 @@
     width: 100%;
   }
 }
+
+/* ========== ESTILOS PARA MODAL DE RESULTADOS ========== */
+.resultados-container {
+  padding: 0.5rem 0;
+}
+
+.resultados-info {
+  color: #4a5568;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.resultados-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.resultado-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.resultado-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transform: translateY(-2px);
+}
+
+.resultado-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.resultado-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.resultado-titulo {
+  font-size: 1.1rem;
+  color: #2d3748;
+}
+
+.resultado-fecha {
+  font-size: 0.9rem;
+  color: #718096;
+}
+
+.resultado-estado {
+  font-size: 0.9rem;
+  color: #48bb78;
+  font-weight: 500;
+}
+
+.resultado-estado.pendiente {
+  color: #ed8936;
+}
+
+.resultado-action {
+  flex-shrink: 0;
+}
+
+.ver-detalle-btn {
+  color: #667eea;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Detalle del Examen */
+.detalle-examen-container {
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.detalle-header {
+  margin-bottom: 1.5rem;
+}
+
+.btn-volver {
+  background: none;
+  border: none;
+  color: #667eea;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-volver:hover {
+  background: #f7fafc;
+  color: #5a67d8;
+}
+
+.detalle-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.detalle-titulo {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.25rem 1.5rem;
+}
+
+.detalle-titulo h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detalle-contenido {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.detalle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.detalle-row:hover {
+  background: #edf2f7;
+}
+
+.detalle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4a5568;
+  font-weight: 500;
+  min-width: 180px;
+}
+
+.detalle-label .icon {
+  font-size: 1.25rem;
+}
+
+.detalle-valor {
+  color: #2d3748;
+  font-weight: 600;
+  text-align: right;
+  flex: 1;
+}
+
+.resultado-principal {
+  background: linear-gradient(135deg, #f6f8ff 0%, #f0f4ff 100%);
+  border: 2px solid #667eea;
+}
+
+.resultado-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #48bb78;
+  color: white;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.resultado-pendiente .resultado-badge {
+  background: #ed8936;
+}
+
+.detalle-acciones {
+  padding: 1.5rem;
+  background: #f7fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.detalle-acciones .btn {
+  min-width: 150px;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  text-align: center;
+  padding: 3rem;
+  color: #4a5568;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #718096;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Responsive para modal de resultados */
+@media (max-width: 768px) {
+  .resultado-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .resultado-action {
+    align-self: flex-end;
+  }
+
+  .detalle-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .detalle-label {
+    min-width: auto;
+  }
+
+  .detalle-valor {
+    text-align: left;
+  }
+}

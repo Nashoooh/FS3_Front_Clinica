@@ -169,12 +169,6 @@ describe('HomeTrabajadorComponent', () => {
       expect(console.log).toHaveBeenCalledWith('Navegando a gestión de citas...');
     });
 
-    it('debe mostrar mensajes de consola para gestión de exámenes', () => {
-      spyOn(console, 'log');
-      component.gestionarExamenes();
-      expect(console.log).toHaveBeenCalledWith('Navegando a gestión de exámenes...');
-    });
-
     it('debe mostrar mensajes de consola para asignar exámenes', () => {
       spyOn(console, 'log');
       component.asignarExamenes();

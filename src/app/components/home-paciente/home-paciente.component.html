@@ -313,3 +313,131 @@
     </div>
   </div>
 </div>
+
+<!-- ========== MODAL RESULTADOS DE EXÁMENES ========== -->
+<div class="modal-overlay" *ngIf="showResultadosModal" (click)="cerrarResultadosModal()">
+  <div class="modal-content large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>📊 Resultados de Exámenes</h2>
+      <button class="close-btn" (click)="cerrarResultadosModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Estado de carga -->
+      <div *ngIf="loading" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Cargando resultados...</p>
+      </div>
+
+      <!-- Sin resultados -->
+      <div *ngIf="!loading && examenes.length === 0" class="empty-state">
+        <div class="empty-icon">📋</div>
+        <p>No hay resultados disponibles</p>
+      </div>
+
+      <!-- Lista de resultados -->
+      <div *ngIf="!loading && examenes.length > 0 && !examenSeleccionado" class="resultados-container">
+        <p class="resultados-info">Tienes {{ examenes.length }} resultado(s) de exámenes</p>
+        <div class="resultados-list">
+          <div class="resultado-item" *ngFor="let examen of examenes" (click)="verDetalleExamen(examen)">
+            <div class="resultado-icon">🔬</div>
+            <div class="resultado-info">
+              <div class="resultado-titulo">
+                <strong>{{ examen.analisisNombre || 'Examen' }}</strong>
+              </div>
+              <div class="resultado-fecha">
+                {{ examen.fechaExamen | date:'dd/MM/yyyy' }}
+              </div>
+              <div class="resultado-estado" [class.pendiente]="!examen.resultado">
+                {{ examen.resultado || 'Pendiente' }}
+              </div>
+            </div>
+            <div class="resultado-action">
+              <span class="ver-detalle-btn">Ver detalle →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalle del examen seleccionado -->
+      <div *ngIf="examenSeleccionado" class="detalle-examen-container">
+        <div class="detalle-header">
+          <button class="btn-volver" (click)="examenSeleccionado = null">
+            ← Volver a la lista
+          </button>
+        </div>
+        
+        <div class="detalle-card">
+          <div class="detalle-titulo">
+            <h3>📋 Detalle del Examen</h3>
+          </div>
+          
+          <div class="detalle-contenido">
+            <div class="detalle-row">
+              <div class="detalle-label">
+                <span class="icon">📅</span>
+                <strong>Fecha del Examen:</strong>
+              </div>
+              <div class="detalle-valor">
+                {{ examenSeleccionado.fechaExamen | date:'dd/MM/yyyy' }}
+              </div>
+            </div>
+
+            <div class="detalle-row">
+              <div class="detalle-label">
+                <span class="icon">🔬</span>
+                <strong>Tipo de Análisis:</strong>
+              </div>
+              <div class="detalle-valor">
+                {{ examenSeleccionado.analisisNombre || getNombreAnalisis(examenSeleccionado.analisisId || 0) }}
+              </div>
+            </div>
+
+            <div class="detalle-row" *ngIf="examenSeleccionado.analisisDescripcion">
+              <div class="detalle-label">
+                <span class="icon">📝</span>
+                <strong>Descripción:</strong>
+              </div>
+              <div class="detalle-valor">
+                {{ examenSeleccionado.analisisDescripcion }}
+              </div>
+            </div>
+
+            <div class="detalle-row">
+              <div class="detalle-label">
+                <span class="icon">🏥</span>
+                <strong>Laboratorio:</strong>
+              </div>
+              <div class="detalle-valor">
+                {{ examenSeleccionado.laboratorioDireccion || getNombreLaboratorio(examenSeleccionado.laboratorioId || 0) }}
+              </div>
+            </div>
+
+            <div class="detalle-row resultado-principal">
+              <div class="detalle-label">
+                <span class="icon">📊</span>
+                <strong>Resultado:</strong>
+              </div>
+              <div class="detalle-valor" [class.resultado-pendiente]="!examenSeleccionado.resultado">
+                <span class="resultado-badge">
+                  {{ examenSeleccionado.resultado || 'Pendiente de procesamiento' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detalle-acciones">
+            <button class="btn btn-secondary" (click)="examenSeleccionado = null">
+              Cerrar Detalle
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+    </div>
+  </div>
+</div>
