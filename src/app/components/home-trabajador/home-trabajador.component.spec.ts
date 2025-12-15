@@ -706,4 +706,295 @@ describe('HomeTrabajadorComponent', () => {
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
     });
   });
+
+  describe('Gestión de Exámenes', () => {
+    beforeEach(() => {
+      // Mock de servicios necesarios para exámenes
+      const mockExamenService = jasmine.createSpyObj('ExamenService', [
+        'getAll', 'getById', 'getByPaciente', 'create', 'update', 'delete'
+      ]);
+      const mockUsuarioService = jasmine.createSpyObj('UsuarioService', [
+        'getAllUsuarios', 'getPacientes'
+      ]);
+
+      // Registrar los servicios en el componente
+      (component as any).examenService = mockExamenService;
+      (component as any).usuarioService = mockUsuarioService;
+
+      // Configurar respuestas por defecto
+      const mockExamenes = [
+        {
+          id: 1,
+          usuarioId: 1,
+          analisisId: 1,
+          analisisNombre: 'Hemograma',
+          laboratorioId: 1,
+          laboratorioDireccion: 'Av. Principal 123',
+          fechaExamen: '2025-01-15',
+          resultado: 'Normal'
+        }
+      ];
+
+      const mockPacientes = [
+        {
+          id: 1,
+          nombre: 'Juan',
+          apellido: 'Pérez',
+          email: 'juan@example.com',
+          rut: '12345678-9',
+          rol: { id: 1, nombre: 'Paciente' }
+        }
+      ];
+
+      mockExamenService.getAll.and.returnValue(of(mockExamenes));
+      mockExamenService.getById.and.returnValue(of(mockExamenes[0]));
+      mockExamenService.create.and.returnValue(of(mockExamenes[0]));
+      mockExamenService.update.and.returnValue(of(mockExamenes[0]));
+      mockExamenService.delete.and.returnValue(of(undefined));
+      mockUsuarioService.getPacientes.and.returnValue(of(mockPacientes));
+      mockCitasService.getAnalisis.and.returnValue(of(mockAnalisis));
+      mockCitasService.getLaboratorios.and.returnValue(of(mockLaboratorios));
+    });
+
+    it('debe abrir modal de exámenes y cargar catálogos', () => {
+      component.asignarExamenes();
+
+      expect(component.showExamenesModal).toBeTrue();
+      expect((component as any).examenService.getAll).toHaveBeenCalled();
+    });
+
+    it('debe cerrar modal de exámenes', () => {
+      component.showExamenesModal = true;
+
+      component.closeExamenesModal();
+
+      expect(component.showExamenesModal).toBeFalse();
+    });
+
+    it('debe cargar lista de exámenes exitosamente', async () => {
+      component.loadExamenes();
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect((component as any).examenService.getAll).toHaveBeenCalled();
+      expect(component.loadingExamenes).toBeFalse();
+    });
+
+    it('debe manejar error al cargar exámenes', async () => {
+      (component as any).examenService.getAll.and.returnValue(throwError(() => new Error('Error')));
+
+      component.loadExamenes();
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(component.examenesErrorMessage).toContain('Error al cargar los exámenes');
+      expect(component.loadingExamenes).toBeFalse();
+    });
+
+    it('debe crear un nuevo examen exitosamente', () => {
+      component.currentExamen = {
+        usuarioId: 1,
+        analisisId: 1,
+        laboratorioId: 1,
+        fechaExamen: '2025-01-15',
+        resultado: 'Normal'
+      };
+
+      component.saveExamen();
+
+      expect((component as any).examenService.create).toHaveBeenCalled();
+      expect(component.examenesSuccessMessage).toContain('Examen creado exitosamente');
+    });
+
+    it('debe actualizar un examen existente', () => {
+      component.isEditingExamen = true;
+      component.currentExamen = {
+        id: 1,
+        usuarioId: 1,
+        analisisId: 1,
+        laboratorioId: 1,
+        fechaExamen: '2025-01-15',
+        resultado: 'Actualizado'
+      };
+
+      component.saveExamen();
+
+      expect((component as any).examenService.update).toHaveBeenCalledWith(1, component.currentExamen);
+      expect(component.examenesSuccessMessage).toContain('Examen actualizado exitosamente');
+    });
+
+    it('debe buscar un examen por ID exitosamente', () => {
+      component.searchExamenId = 1;
+
+      component.searchExamenById();
+
+      expect((component as any).examenService.getById).toHaveBeenCalledWith(1);
+    });
+
+    it('debe no buscar si no hay ID', () => {
+      component.searchExamenId = null;
+
+      component.searchExamenById();
+
+      expect((component as any).examenService.getById).not.toHaveBeenCalled();
+    });
+
+    it('debe editar un examen desde la lista', () => {
+      const examen = {
+        id: 1,
+        usuarioId: 1,
+        analisisId: 1,
+        laboratorioId: 1,
+        fechaExamen: '2025-01-15',
+        resultado: 'Normal'
+      };
+
+      component.editExamen(examen);
+
+      expect(component.currentExamen).toEqual(examen);
+      expect(component.isEditingExamen).toBeTrue();
+      expect(component.examenesActiveTab).toBe('create');
+    });
+
+    it('debe eliminar un examen exitosamente', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+
+      component.deleteExamen(1);
+
+      expect((component as any).examenService.delete).toHaveBeenCalledWith(1);
+      expect(component.examenesSuccessMessage).toContain('Examen eliminado exitosamente');
+    });
+
+    it('debe cancelar eliminación si usuario no confirma', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+
+      component.deleteExamen(1);
+
+      expect((component as any).examenService.delete).not.toHaveBeenCalled();
+    });
+
+    it('debe manejar error al eliminar examen', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      (component as any).examenService.delete.and.returnValue(throwError(() => new Error('Error')));
+
+      component.deleteExamen(1);
+
+      expect(component.examenesErrorMessage).toContain('Error al eliminar el examen');
+    });
+
+    it('debe resetear formulario de examen', () => {
+      component.currentExamen = {
+        id: 1,
+        usuarioId: 1,
+        analisisId: 1,
+        laboratorioId: 1,
+        fechaExamen: '2025-01-15',
+        resultado: 'Test'
+      };
+      component.isEditingExamen = true;
+
+      component.resetExamenForm();
+
+      expect(component.currentExamen.usuarioId).toBe(0);
+      expect(component.currentExamen.analisisId).toBe(0);
+      expect(component.currentExamen.laboratorioId).toBe(0);
+      expect(component.currentExamen.fechaExamen).toBe('');
+      expect(component.currentExamen.resultado).toBe('');
+      expect(component.isEditingExamen).toBeFalse();
+    });
+
+    it('debe limpiar mensajes de exámenes', () => {
+      component.examenesSuccessMessage = 'Éxito';
+      component.examenesErrorMessage = 'Error';
+
+      component.clearExamenesMessages();
+
+      expect(component.examenesSuccessMessage).toBe('');
+      expect(component.examenesErrorMessage).toBe('');
+    });
+
+    it('debe cargar catálogos al abrir modal de exámenes', async () => {
+      component.asignarExamenes();
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(component.pacientesList.length).toBeGreaterThanOrEqual(0);
+      expect(component.analisisListForExamen.length).toBeGreaterThanOrEqual(0);
+      expect(component.laboratoriosListForExamen.length).toBeGreaterThanOrEqual(0);
+    });
+
+    it('debe mostrar información enriquecida del examen en la lista', () => {
+      const examen = {
+        id: 1,
+        usuarioId: 1,
+        analisisId: 1,
+        analisisNombre: 'Hemograma',
+        laboratorioId: 1,
+        laboratorioDireccion: 'Av. Principal 123',
+        fechaExamen: '2025-01-15',
+        resultado: 'Normal'
+      };
+      component.examenesList = [examen];
+
+      expect(component.examenesList[0].analisisNombre).toBe('Hemograma');
+      expect(component.examenesList[0].laboratorioDireccion).toBe('Av. Principal 123');
+    });
+
+    it('debe manejar error al crear examen', () => {
+      component.currentExamen = {
+        usuarioId: 1,
+        analisisId: 1,
+        laboratorioId: 1,
+        fechaExamen: '2025-01-15',
+        resultado: 'Test'
+      };
+      (component as any).examenService.create.and.returnValue(throwError(() => new Error('Error')));
+
+      component.saveExamen();
+
+      expect(component.examenesErrorMessage).toContain('Error al crear el examen');
+    });
+
+    it('debe manejar error al actualizar examen', () => {
+      component.isEditingExamen = true;
+      component.currentExamen = {
+        id: 1,
+        usuarioId: 1,
+        analisisId: 1,
+        laboratorioId: 1,
+        fechaExamen: '2025-01-15',
+        resultado: 'Test'
+      };
+      (component as any).examenService.update.and.returnValue(throwError(() => new Error('Error')));
+
+      component.saveExamen();
+
+      expect(component.examenesErrorMessage).toContain('Error al actualizar el examen');
+    });
+
+    it('debe manejar error al buscar examen', () => {
+      component.searchExamenId = 999;
+      (component as any).examenService.getById.and.returnValue(throwError(() => ({ status: 404 })));
+
+      component.searchExamenById();
+
+      expect(component.examenesErrorMessage).toContain('No se encontró el examen con ese ID');
+    });
+
+    it('debe resetear formulario al eliminar examen exitosamente', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      component.searchedExamen = {
+        id: 1,
+        usuarioId: 1,
+        analisisId: 1,
+        laboratorioId: 1,
+        fechaExamen: '2025-01-15',
+        resultado: 'Test'
+      };
+
+      component.deleteExamen(1);
+
+      expect(component.searchedExamen).toBeNull();
+    });
+  });
 });

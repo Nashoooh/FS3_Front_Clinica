@@ -6,6 +6,7 @@ import { of, throwError, BehaviorSubject } from 'rxjs';
 import { HomePacienteComponent } from './home-paciente.component';
 import { AuthService } from '../../services/auth.service';
 import { CitasService } from '../../services/citas.service';
+import { ExamenService, Examen } from '../../services/examen.service';
 import { Usuario } from '../../models/usuario.model';
 
 describe('HomePacienteComponent', () => {
@@ -13,6 +14,7 @@ describe('HomePacienteComponent', () => {
   let fixture: ComponentFixture<HomePacienteComponent>;
   let mockAuthService: jasmine.SpyObj<AuthService>;
   let mockCitasService: jasmine.SpyObj<CitasService>;
+  let mockExamenService: jasmine.SpyObj<ExamenService>;
   let mockRouter: jasmine.SpyObj<Router>;
   let currentUserSubject: BehaviorSubject<Usuario | null>;
 
@@ -46,6 +48,29 @@ describe('HomePacienteComponent', () => {
     }
   ];
 
+  const mockExamenes: Examen[] = [
+    {
+      id: 1,
+      usuarioId: 1,
+      analisisId: 1,
+      analisisNombre: 'Hemograma',
+      laboratorioId: 1,
+      laboratorioDireccion: 'Av. Principal 123',
+      fechaExamen: '2025-01-15',
+      resultado: 'Normal'
+    },
+    {
+      id: 2,
+      usuarioId: 1,
+      analisisId: 2,
+      analisisNombre: 'Glucemia',
+      laboratorioId: 1,
+      laboratorioDireccion: 'Av. Principal 123',
+      fechaExamen: '2025-01-16',
+      resultado: '95 mg/dL'
+    }
+  ];
+
   beforeEach(async () => {
     currentUserSubject = new BehaviorSubject<Usuario | null>(mockUsuario);
     
@@ -55,6 +80,9 @@ describe('HomePacienteComponent', () => {
     const citasServiceSpy = jasmine.createSpyObj('CitasService', [
       'getAnalisis', 'getLaboratorios', 'getSolicitudes', 'createSolicitud', 'deleteSolicitud'
     ]);
+    const examenServiceSpy = jasmine.createSpyObj('ExamenService', [
+      'getAll', 'getById', 'getByPaciente', 'create', 'update', 'delete'
+    ]);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
@@ -62,6 +90,7 @@ describe('HomePacienteComponent', () => {
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
         { provide: CitasService, useValue: citasServiceSpy },
+        { provide: ExamenService, useValue: examenServiceSpy },
         { provide: Router, useValue: routerSpy }
       ]
     }).compileComponents();
@@ -70,12 +99,14 @@ describe('HomePacienteComponent', () => {
     component = fixture.componentInstance;
     mockAuthService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     mockCitasService = TestBed.inject(CitasService) as jasmine.SpyObj<CitasService>;
+    mockExamenService = TestBed.inject(ExamenService) as jasmine.SpyObj<ExamenService>;
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
 
     // Configurar mocks por defecto
     mockCitasService.getAnalisis.and.returnValue(of(mockAnalisis));
     mockCitasService.getLaboratorios.and.returnValue(of(mockLaboratorios));
     mockCitasService.getSolicitudes.and.returnValue(of(mockSolicitudes));
+    mockExamenService.getByPaciente.and.returnValue(of(mockExamenes));
     
     fixture.detectChanges();
   });
@@ -321,14 +352,6 @@ describe('HomePacienteComponent', () => {
     expect(nombre).toBe('Desconocido');
   });
 
-  it('debe llamar console.log al ver resultados', () => {
-    spyOn(console, 'log');
-
-    component.verResultados();
-
-    expect(console.log).toHaveBeenCalledWith('Navegando a resultados...');
-  });
-
   it('debe llamar console.log al ver historial', () => {
     spyOn(console, 'log');
 
@@ -343,5 +366,168 @@ describe('HomePacienteComponent', () => {
     component.editarPerfil();
 
     expect(console.log).toHaveBeenCalledWith('Navegando a perfil...');
+  });
+
+  describe('Funcionalidad de Resultados de Exámenes', () => {
+    it('debe abrir modal de resultados y cargar exámenes', async () => {
+      component.verResultados();
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(mockExamenService.getByPaciente).toHaveBeenCalledWith(1);
+      expect(component.examenes).toEqual(mockExamenes);
+      expect(component.showResultadosModal).toBeTrue();
+      expect(component.loading).toBeFalse();
+    });
+
+    it('debe manejar error al cargar resultados', async () => {
+      mockExamenService.getByPaciente.and.returnValue(throwError(() => new Error('Error')));
+
+      component.verResultados();
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(component.errorMessage).toContain('Error al cargar los resultados');
+      expect(component.loading).toBeFalse();
+    });
+
+    it('no debe cargar resultados si no hay usuario', () => {
+      component.usuario = null;
+
+      component.verResultados();
+
+      expect(mockExamenService.getByPaciente).not.toHaveBeenCalled();
+    });
+
+    it('debe cerrar modal de resultados y limpiar examen seleccionado', () => {
+      component.showResultadosModal = true;
+      component.examenSeleccionado = mockExamenes[0];
+
+      component.cerrarResultadosModal();
+
+      expect(component.showResultadosModal).toBeFalse();
+      expect(component.examenSeleccionado).toBeNull();
+    });
+
+    it('debe seleccionar examen para ver detalle', () => {
+      const examen = mockExamenes[0];
+
+      component.verDetalleExamen(examen);
+
+      expect(component.examenSeleccionado).toEqual(examen);
+    });
+
+    it('debe mostrar resultados con información enriquecida', () => {
+      component.examenes = mockExamenes;
+
+      expect(component.examenes[0].analisisNombre).toBe('Hemograma');
+      expect(component.examenes[0].laboratorioDireccion).toBe('Av. Principal 123');
+      expect(component.examenes[1].resultado).toBe('95 mg/dL');
+    });
+
+    it('debe actualizar lista de exámenes correctamente', async () => {
+      const nuevosExamenes: Examen[] = [
+        {
+          id: 3,
+          usuarioId: 1,
+          analisisId: 1,
+          analisisNombre: 'Rayos X',
+          laboratorioId: 2,
+          laboratorioDireccion: 'Calle Norte 456',
+          fechaExamen: '2025-01-17',
+          resultado: 'Sin hallazgos'
+        }
+      ];
+      mockExamenService.getByPaciente.and.returnValue(of(nuevosExamenes));
+
+      component.verResultados();
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(component.examenes).toEqual(nuevosExamenes);
+      expect(component.examenes.length).toBe(1);
+    });
+  });
+
+  describe('Edge cases y validaciones adicionales', () => {
+    it('debe manejar lista vacía de análisis al cargar catálogos', async () => {
+      mockCitasService.getAnalisis.and.returnValue(of([]));
+
+      component.cargarCatalogos();
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(component.analisisList).toEqual([]);
+      expect(component.loading).toBeFalse();
+    });
+
+    it('debe manejar lista vacía de laboratorios al cargar catálogos', async () => {
+      mockCitasService.getLaboratorios.and.returnValue(of([]));
+
+      component.cargarCatalogos();
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(component.laboratoriosList).toEqual([]);
+      expect(component.loading).toBeFalse();
+    });
+
+    it('debe resetear formulario correctamente', () => {
+      component.nuevaSolicitud = { analisisId: 1, laboratorioId: 1, fecha: '2025-11-18' };
+
+      component.resetSolicitudForm();
+
+      expect(component.nuevaSolicitud.analisisId).toBe(0);
+      expect(component.nuevaSolicitud.laboratorioId).toBe(0);
+      expect(component.nuevaSolicitud.fecha).toBe('');
+    });
+
+    it('debe manejar respuesta undefined de catálogos', async () => {
+      mockCitasService.getAnalisis.and.returnValue(of(undefined as any));
+      mockCitasService.getLaboratorios.and.returnValue(of(undefined as any));
+
+      component.cargarCatalogos();
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(component.analisisList).toEqual([]);
+      expect(component.laboratoriosList).toEqual([]);
+    });
+
+    it('debe manejar error genérico en enviarSolicitud', () => {
+      component.nuevaSolicitud = { analisisId: 1, laboratorioId: 1, fecha: '2025-11-18' };
+      mockCitasService.createSolicitud.and.returnValue(throwError(() => ({ error: {} })));
+
+      component.enviarSolicitud();
+
+      expect(component.errorMessage).toBe('Error al crear la solicitud');
+    });
+
+    it('debe cerrar modal después de solicitud exitosa', (done) => {
+      component.nuevaSolicitud = { analisisId: 1, laboratorioId: 1, fecha: '2025-11-18' };
+      const mockResponse = { id: 1, usuarioId: 1, analisisId: 1, laboratorioId: 1, fechaSolicitud: '2025-11-18', estado: 'pendiente' };
+      mockCitasService.createSolicitud.and.returnValue(of(mockResponse));
+
+      component.enviarSolicitud();
+
+      setTimeout(() => {
+        expect(component.showSolicitarModal).toBeFalse();
+        done();
+      }, 2100);
+    });
+
+    it('debe filtrar solo solicitudes del usuario al cargar', () => {
+      const todasSolicitudes = [
+        { id: 1, usuarioId: 1, analisisId: 1, laboratorioId: 1, fechaSolicitud: '2025-11-18', estado: 'pendiente' },
+        { id: 2, usuarioId: 2, analisisId: 1, laboratorioId: 1, fechaSolicitud: '2025-11-18', estado: 'pendiente' },
+        { id: 3, usuarioId: 1, analisisId: 2, laboratorioId: 2, fechaSolicitud: '2025-11-19', estado: 'completado' }
+      ];
+      mockCitasService.getSolicitudes.and.returnValue(of(todasSolicitudes));
+
+      component.cargarMisSolicitudes();
+
+      expect(component.misSolicitudes.length).toBe(2);
+      expect(component.misSolicitudes.every(s => s.usuarioId === 1)).toBeTrue();
+    });
   });
 });
