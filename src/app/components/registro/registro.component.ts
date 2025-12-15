@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { CatalogosService } from '../../services/catalogos.service';
 import { Usuario } from '../../models/usuario.model';
 import { Prevision, Rol } from '../../models/prevision-rol.model';
+import { passwordStrengthValidator, getPasswordErrorMessage } from '../../validators/password.validator';
 
 @Component({
   selector: 'app-registro',
@@ -33,7 +34,7 @@ export class RegistroComponent implements OnInit {
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       apellido: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, passwordStrengthValidator()]],
       confirmPassword: ['', [Validators.required]],
       telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{8,9}$/)]],
       rut: ['', [Validators.required, Validators.pattern(/^[0-9]+-[0-9kK]{1}$/)]],
@@ -76,6 +77,14 @@ export class RegistroComponent implements OnInit {
   }
 
   get f() { return this.registroForm.controls; }
+
+  getPasswordErrorMessage(): string {
+    const passwordControl = this.registroForm.get('password');
+    if (!passwordControl) {
+      return '';
+    }
+    return getPasswordErrorMessage(passwordControl.errors);
+  }
 
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('password');

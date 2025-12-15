@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { passwordStrengthValidator, getPasswordErrorMessage } from '../../validators/password.validator';
 
 @Component({
   selector: 'app-recuperar-password',
@@ -30,13 +31,21 @@ export class RecuperarPasswordComponent {
     });
 
     this.passwordForm = this.formBuilder.group({
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      newPassword: ['', [Validators.required, passwordStrengthValidator()]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
   }
 
   get emailF() { return this.emailForm.controls; }
   get passwordF() { return this.passwordForm.controls; }
+
+  getPasswordErrorMessage(): string {
+    const passwordControl = this.passwordForm.get('newPassword');
+    if (!passwordControl) {
+      return '';
+    }
+    return getPasswordErrorMessage(passwordControl.errors);
+  }
 
   passwordMatchValidator(form: FormGroup) {
     const newPassword = form.get('newPassword');

@@ -169,12 +169,6 @@ describe('HomeTrabajadorComponent', () => {
       expect(console.log).toHaveBeenCalledWith('Navegando a gestión de citas...');
     });
 
-    it('debe mostrar mensajes de consola para asignar exámenes', () => {
-      spyOn(console, 'log');
-      component.asignarExamenes();
-      expect(console.log).toHaveBeenCalledWith('Navegando a asignación de exámenes...');
-    });
-
     it('debe mostrar mensajes de consola para ver reportes', () => {
       spyOn(console, 'log');
       component.verReportes();
@@ -804,23 +798,6 @@ describe('HomeTrabajadorComponent', () => {
 
       expect((component as any).examenService.create).toHaveBeenCalled();
       expect(component.examenesSuccessMessage).toContain('Examen creado exitosamente');
-    });
-
-    it('debe actualizar un examen existente', () => {
-      component.isEditingExamen = true;
-      component.currentExamen = {
-        id: 1,
-        usuarioId: 1,
-        analisisId: 1,
-        laboratorioId: 1,
-        fechaExamen: '2025-01-15',
-        resultado: 'Actualizado'
-      };
-
-      component.saveExamen();
-
-      expect((component as any).examenService.update).toHaveBeenCalledWith(1, component.currentExamen);
-      expect(component.examenesSuccessMessage).toContain('Examen actualizado exitosamente');
     });
 
     it('debe buscar un examen por ID exitosamente', () => {

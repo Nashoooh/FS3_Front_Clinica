@@ -64,9 +64,11 @@
             [class.is-invalid]="f['password'].invalid && f['password'].touched"
             placeholder="Mínimo 6 caracteres">
           <div *ngIf="f['password'].invalid && f['password'].touched" class="invalid-feedback">
-            <div *ngIf="f['password'].errors?.['required']">La contraseña es requerida</div>
-            <div *ngIf="f['password'].errors?.['minlength']">La contraseña debe tener al menos 6 caracteres</div>
+            <div>{{ getPasswordErrorMessage() }}</div>
           </div>
+          <small class="form-text text-muted">
+            La contraseña debe contener: mínimo 6 caracteres, una mayúscula, una minúscula y un número
+          </small>
         </div>
 
         <div class="form-group">

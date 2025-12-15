@@ -108,8 +108,8 @@ describe('RegistroComponent', () => {
 
   it('debe validar que las contraseñas coincidan', () => {
     component.registroForm.patchValue({
-      password: '123456',
-      confirmPassword: '654321'
+      password: 'Test123',
+      confirmPassword: 'Test456'
     });
 
     const isValid = component.passwordMatchValidator(component.registroForm);
@@ -120,8 +120,8 @@ describe('RegistroComponent', () => {
 
   it('debe pasar validación cuando las contraseñas coinciden', () => {
     component.registroForm.patchValue({
-      password: '123456',
-      confirmPassword: '123456'
+      password: 'Test123',
+      confirmPassword: 'Test123'
     });
 
     const isValid = component.passwordMatchValidator(component.registroForm);
@@ -144,8 +144,8 @@ describe('RegistroComponent', () => {
       nombre: 'Juan',
       apellido: 'Pérez',
       email: 'juan@test.com',
-      password: '123456',
-      confirmPassword: '123456',
+      password: 'Test123',
+      confirmPassword: 'Test123',
       telefono: '987654321',
       rut: '12345678-9',
       fechaNacimiento: '1990-01-01',
