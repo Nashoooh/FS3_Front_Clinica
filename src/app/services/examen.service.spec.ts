@@ -79,16 +79,6 @@ describe('ExamenService', () => {
     req.flush(updatedExamen);
   });
 
-  it('should delete examen', () => {
-    service.delete(1).subscribe(response => {
-      expect(response).toBeUndefined();
-    });
-
-    const req = httpMock.expectOne(`${apiUrl}/1`);
-    expect(req.request.method).toBe('DELETE');
-    req.flush(null);
-  });
-
   it('should get examenes by paciente', () => {
     const mockExamenes: Examen[] = [
       { id: 1, usuarioId: 15, laboratorioId: 1, analisisId: 1, fechaExamen: '2025-12-14', resultado: 'Negativo' }

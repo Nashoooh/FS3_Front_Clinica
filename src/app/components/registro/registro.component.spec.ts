@@ -179,8 +179,8 @@ describe('RegistroComponent', () => {
       nombre: 'Juan',
       apellido: 'Pérez',
       email: 'juan@test.com',
-      password: '123456',
-      confirmPassword: '123456',
+      password: 'Test123',
+      confirmPassword: 'Test123',
       telefono: '987654321',
       rut: '12345678-9',
       fechaNacimiento: '1990-01-01',
@@ -206,8 +206,8 @@ describe('RegistroComponent', () => {
       nombre: 'Juan',
       apellido: 'Pérez',
       email: 'juan@test.com',
-      password: '123456',
-      confirmPassword: '123456',
+      password: 'Test123',
+      confirmPassword: 'Test123',
       telefono: '987654321',
       rut: '12345678-9',
       fechaNacimiento: '1990-01-01',
@@ -233,8 +233,8 @@ describe('RegistroComponent', () => {
       nombre: 'Juan',
       apellido: 'Pérez',
       email: 'juan@test.com',
-      password: '123456',
-      confirmPassword: '123456',
+      password: 'Test123',
+      confirmPassword: 'Test123',
       telefono: '987654321',
       rut: '12345678-9',
       fechaNacimiento: '1990-01-01',
@@ -291,14 +291,38 @@ describe('RegistroComponent', () => {
     expect(component.registroForm.get('email')?.hasError('email')).toBeFalse();
   });
 
-  it('debe validar longitud mínima de contraseña', () => {
-    component.registroForm.get('password')?.setValue('123');
+  it('debe validar contraseña con regla de 4 (mayúscula, minúscula, número, longitud 6)', () => {
+    // Contraseña muy corta
+    component.registroForm.get('password')?.setValue('Te1');
+    expect(component.registroForm.get('password')?.invalid).toBeTrue();
     
-    expect(component.registroForm.get('password')?.hasError('minlength')).toBeTrue();
+    // Contraseña sin mayúscula
+    component.registroForm.get('password')?.setValue('test123');
+    expect(component.registroForm.get('password')?.invalid).toBeTrue();
     
-    component.registroForm.get('password')?.setValue('123456');
+    // Contraseña sin minúscula
+    component.registroForm.get('password')?.setValue('TEST123');
+    expect(component.registroForm.get('password')?.invalid).toBeTrue();
     
-    expect(component.registroForm.get('password')?.hasError('minlength')).toBeFalse();
+    // Contraseña sin número
+    component.registroForm.get('password')?.setValue('TestTest');
+    expect(component.registroForm.get('password')?.invalid).toBeTrue();
+    
+    // Contraseña válida
+    component.registroForm.get('password')?.setValue('Test123');
+    expect(component.registroForm.get('password')?.valid).toBeTrue();
+    
+    // Contraseña válida con símbolos
+    component.registroForm.get('password')?.setValue('Test123!@#');
+    expect(component.registroForm.get('password')?.valid).toBeTrue();
+  });
+
+  it('debe obtener mensaje de error de contraseña', () => {
+    component.registroForm.get('password')?.setValue('test');
+    component.registroForm.get('password')?.markAsTouched();
+    
+    const message = component.getPasswordErrorMessage();
+    expect(message).toContain('contraseña debe contener');
   });
 
   it('debe validar formato de RUT', () => {

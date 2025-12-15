@@ -65,21 +65,46 @@ describe('RecuperarPasswordComponent', () => {
     expect(emailControl?.hasError('email')).toBeFalse();
   });
 
-  it('debe validar longitud mínima de nueva contraseña', () => {
+  it('debe validar contraseña con regla de 4 (mayúscula, minúscula, número, longitud 6)', () => {
     const passwordControl = component.passwordForm.get('newPassword');
-    passwordControl?.setValue('123');
     
-    expect(passwordControl?.hasError('minlength')).toBeTrue();
+    // Contraseña muy corta
+    passwordControl?.setValue('Te1');
+    expect(passwordControl?.invalid).toBeTrue();
     
-    passwordControl?.setValue('123456');
+    // Contraseña sin mayúscula
+    passwordControl?.setValue('test123');
+    expect(passwordControl?.invalid).toBeTrue();
     
-    expect(passwordControl?.hasError('minlength')).toBeFalse();
+    // Contraseña sin minúscula
+    passwordControl?.setValue('TEST123');
+    expect(passwordControl?.invalid).toBeTrue();
+    
+    // Contraseña sin número
+    passwordControl?.setValue('TestTest');
+    expect(passwordControl?.invalid).toBeTrue();
+    
+    // Contraseña válida
+    passwordControl?.setValue('Test123');
+    expect(passwordControl?.valid).toBeTrue();
+    
+    // Contraseña válida con símbolos
+    passwordControl?.setValue('Test123!@#');
+    expect(passwordControl?.valid).toBeTrue();
+  });
+
+  it('debe obtener mensaje de error de contraseña', () => {
+    component.passwordForm.get('newPassword')?.setValue('test');
+    component.passwordForm.get('newPassword')?.markAsTouched();
+    
+    const message = component.getPasswordErrorMessage();
+    expect(message).toContain('contraseña debe contener');
   });
 
   it('debe validar que las contraseñas coincidan', () => {
     component.passwordForm.patchValue({
-      newPassword: '123456',
-      confirmPassword: '654321'
+      newPassword: 'Test123',
+      confirmPassword: 'Test456'
     });
 
     const isValid = component.passwordMatchValidator(component.passwordForm);
@@ -144,8 +169,8 @@ describe('RecuperarPasswordComponent', () => {
     component.step = 2;
     component.emailToRecover = 'test@email.com';
     component.passwordForm.patchValue({
-      newPassword: '123456',
-      confirmPassword: '123456'
+      newPassword: 'Test123',
+      confirmPassword: 'Test123'
     });
 
     mockAuthService.resetPassword.and.returnValue(of({ success: true, message: 'Contraseña actualizada' }));
@@ -154,15 +179,15 @@ describe('RecuperarPasswordComponent', () => {
 
     expect(component.loading).toBeFalse();
     expect(component.successMessage).toContain('Contraseña actualizada correctamente');
-    expect(mockAuthService.resetPassword).toHaveBeenCalledWith('test@email.com', '123456');
+    expect(mockAuthService.resetPassword).toHaveBeenCalledWith('test@email.com', 'Test123');
   });
 
   it('debe manejar error al resetear contraseña desde respuesta', () => {
     component.step = 2;
     component.emailToRecover = 'test@email.com';
     component.passwordForm.patchValue({
-      newPassword: '123456',
-      confirmPassword: '123456'
+      newPassword: 'Test123',
+      confirmPassword: 'Test123'
     });
 
     mockAuthService.resetPassword.and.returnValue(of({ success: false, message: 'Error personalizado' }));
@@ -177,8 +202,8 @@ describe('RecuperarPasswordComponent', () => {
     component.step = 2;
     component.emailToRecover = 'test@email.com';
     component.passwordForm.patchValue({
-      newPassword: '123456',
-      confirmPassword: '123456'
+      newPassword: 'Test123',
+      confirmPassword: 'Test123'
     });
 
     mockAuthService.resetPassword.and.returnValue(throwError(() => new Error('Network error')));

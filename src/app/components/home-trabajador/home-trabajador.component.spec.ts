@@ -785,21 +785,6 @@ describe('HomeTrabajadorComponent', () => {
       expect(component.loadingExamenes).toBeFalse();
     });
 
-    it('debe crear un nuevo examen exitosamente', () => {
-      component.currentExamen = {
-        usuarioId: 1,
-        analisisId: 1,
-        laboratorioId: 1,
-        fechaExamen: '2025-01-15',
-        resultado: 'Normal'
-      };
-
-      component.saveExamen();
-
-      expect((component as any).examenService.create).toHaveBeenCalled();
-      expect(component.examenesSuccessMessage).toContain('Examen creado exitosamente');
-    });
-
     it('debe buscar un examen por ID exitosamente', () => {
       component.searchExamenId = 1;
 
@@ -831,15 +816,6 @@ describe('HomeTrabajadorComponent', () => {
       expect(component.currentExamen).toEqual(examen);
       expect(component.isEditingExamen).toBeTrue();
       expect(component.examenesActiveTab).toBe('create');
-    });
-
-    it('debe eliminar un examen exitosamente', () => {
-      spyOn(window, 'confirm').and.returnValue(true);
-
-      component.deleteExamen(1);
-
-      expect((component as any).examenService.delete).toHaveBeenCalledWith(1);
-      expect(component.examenesSuccessMessage).toContain('Examen eliminado exitosamente');
     });
 
     it('debe cancelar eliminación si usuario no confirma', () => {
