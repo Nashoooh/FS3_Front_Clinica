@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { CitasService } from '../../services/citas.service';
 import { ExamenService, Examen } from '../../services/examen.service';
+import { UsuarioService } from '../../services/usuario.service';
 import { Usuario } from '../../models/usuario.model';
 import { Analisis, Laboratorio } from '../../models/citas.model';
 
@@ -56,12 +57,18 @@ export class HomeTrabajadorComponent implements OnInit {
   isEditingExamen = false;
   examenesSuccessMessage = '';
   examenesErrorMessage = '';
+  
+  // Listas para los selectores de crear examen
+  pacientesList: Usuario[] = [];
+  analisisListForExamen: Analisis[] = [];
+  laboratoriosListForExamen: Laboratorio[] = [];
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private citasService: CitasService,
-    private examenService: ExamenService
+    private examenService: ExamenService,
+    private usuarioService: UsuarioService
   ) {}
 
   ngOnInit(): void {
@@ -381,6 +388,7 @@ export class HomeTrabajadorComponent implements OnInit {
     this.showExamenesModal = true;
     this.examenesActiveTab = 'list';
     this.loadExamenes();
+    this.loadCatalogosForExamen();
   }
 
   closeExamenesModal(): void {
@@ -401,6 +409,38 @@ export class HomeTrabajadorComponent implements OnInit {
         console.error('Error al cargar exámenes:', error);
         this.examenesErrorMessage = 'Error al cargar los exámenes';
         this.loadingExamenes = false;
+      }
+    });
+  }
+
+  loadCatalogosForExamen(): void {
+    // Cargar pacientes
+    this.usuarioService.getPacientes().subscribe({
+      next: (data: Usuario[]) => {
+        this.pacientesList = data;
+      },
+      error: (error: any) => {
+        console.error('Error al cargar pacientes:', error);
+      }
+    });
+
+    // Cargar análisis
+    this.citasService.getAnalisis().subscribe({
+      next: (data: Analisis[]) => {
+        this.analisisListForExamen = data;
+      },
+      error: (error: any) => {
+        console.error('Error al cargar análisis:', error);
+      }
+    });
+
+    // Cargar laboratorios
+    this.citasService.getLaboratorios().subscribe({
+      next: (data: Laboratorio[]) => {
+        this.laboratoriosListForExamen = data;
+      },
+      error: (error: any) => {
+        console.error('Error al cargar laboratorios:', error);
       }
     });
   }
